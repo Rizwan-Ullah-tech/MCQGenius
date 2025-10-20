@@ -154,6 +154,15 @@
         let startTime = new Date();
         let timerInterval = null;
 
+        function escapeHTML(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadDarkMode();
             setupDarkModeToggle();
@@ -206,7 +215,7 @@
                     <label class="option-label" data-question="${index}" data-option="${optIndex}">
                         <input type="radio" name="question${index}" value="${optIndex}" 
                             class="form-radio" style="margin-right: 0.75rem; margin-top: 0.125rem;">
-                        <span class="option-text" style="flex: 1;">${option}</span>
+                        <span class="option-text" style="flex: 1;">${escapeHTML(option)}</span>
                     </label>
                 `).join('');
 
@@ -218,7 +227,7 @@
                         </div>
                     </div>
                     <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--color-gray-800);">
-                        ${index + 1}. ${question.question}
+                        ${index + 1}. ${escapeHTML(question.question)}
                     </div>
                     <div class="options-container">
                         ${optionsHTML}
