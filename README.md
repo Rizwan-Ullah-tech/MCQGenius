@@ -3,8 +3,8 @@
 
 A comprehensive multi-page MCQ (Multiple Choice Questions) exam management system for creating, taking, and managing tests. Built with vanilla JavaScript, HTML5, and CSS3.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://your-replit-url.replit.app)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-green)](https://rizwan-ullah-tech.github.io/MCQGenius/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## 🎯 Features
 
@@ -32,7 +32,7 @@ A comprehensive multi-page MCQ (Multiple Choice Questions) exam management syste
 
 ## 📸 Screenshots
 
-*(Add screenshots of your application here)*
+<!-- Screenshots will be added here once available. -->
 
 ## 🚀 Quick Start
 
@@ -44,8 +44,8 @@ A comprehensive multi-page MCQ (Multiple Choice Questions) exam management syste
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/mcq-exam-system.git
-   cd mcq-exam-system
+   git clone https://github.com/Rizwan-Ullah-tech/MCQGenius.git
+   cd MCQGenius
    ```
 
 2. **Start the development server**
@@ -211,16 +211,13 @@ Dark mode is available across all pages. Click the moon/sun icon (🌙/☀️) i
 
 ## 🚀 Deployment
 
-### Deploy on Replit
-1. Import this repository to Replit
-2. The server will start automatically
-3. Your app will be live at `https://your-repl-name.replit.app`
+
 
 ### Deploy on GitHub Pages
-1. Push to GitHub
+1. Push your changes to the `main` branch on GitHub
 2. Go to Settings → Pages
-3. Select branch and `/root` folder
-4. Your site will be live at `https://yourusername.github.io/repo-name`
+3. Select branch and set the folder to `/` (root)
+4. Your site will be live at `https://rizwan-ullah-tech.github.io/MCQGenius/`
 
 **Note**: Since this is a static site with ES6 modules, it works perfectly on GitHub Pages without any build process.
 
@@ -240,7 +237,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-Your Name - [Your GitHub Profile](https://github.com/yourusername)
+Rizwan Ullah - [Your GitHub Profile](https://github.com/Rizwan-Ullah-tech)
 
 ## 🙏 Acknowledgments
 
@@ -250,7 +247,7 @@ Your Name - [Your GitHub Profile](https://github.com/yourusername)
 
 ## 📞 Support
 
-For support, email your-email@example.com or open an issue in the GitHub repository.
+For support, email Rizwan.ullah.tech@gmail.com or open an issue in the GitHub repository.
 
 ---
 
