@@ -66,6 +66,7 @@
 
     <script type="module">
         import coursesData from './data/courses.js';
+        import { escapeHTML } from './js/utils.js';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -85,11 +86,11 @@
                 const courseCard = document.createElement('div');
                 courseCard.className = 'course-card slide-in';
                 courseCard.innerHTML = `
-                    <div class="course-icon" style="background: linear-gradient(135deg, ${course.color} 0%, ${adjustColor(course.color, -20)} 100%);">
-                        ${course.icon}
+                    <div class="course-icon" style="background: linear-gradient(135deg, ${escapeHTML(course.color)} 0%, ${escapeHTML(adjustColor(course.color, -20))} 100%);">
+                        ${escapeHTML(course.icon)}
                     </div>
-                    <h3 class="course-title">${course.name}</h3>
-                    <p class="course-meta">${course.fullName}</p>
+                    <h3 class="course-title">${escapeHTML(course.name)}</h3>
+                    <p class="course-meta">${escapeHTML(course.fullName)}</p>
                     <p class="course-meta" style="margin-top: 0.5rem;">
                         📚 ${activeSemesters} Active Semester${activeSemesters !== 1 ? 's' : ''}
                     </p>

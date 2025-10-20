@@ -241,6 +241,7 @@
 
     <script type="module">
         import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
 
         let currentTest = null;
         let questions = [];
@@ -284,14 +285,14 @@
 
         function displayTestInfo() {
             const info = document.getElementById('testInfo');
-            const booksText = currentTest.books.map(b => b.title).join(', ');
+            const booksText = currentTest.books.map(b => escapeHTML(b.title)).join(', ');
             
             info.innerHTML = `
-                <p><strong>Course:</strong> ${currentTest.courseName}</p>
-                <p><strong>Semester:</strong> ${currentTest.semester}</p>
+                <p><strong>Course:</strong> ${escapeHTML(currentTest.courseName)}</p>
+                <p><strong>Semester:</strong> ${escapeHTML(String(currentTest.semester))}</p>
                 <p><strong>Books:</strong> ${booksText}</p>
                 <p><strong>Questions:</strong> ${questions.length}</p>
-                <p><strong>Date:</strong> ${new Date(currentTest.timestamp).toLocaleDateString()}</p>
+                <p><strong>Date:</strong> ${escapeHTML(new Date(currentTest.timestamp).toLocaleDateString())}</p>
             `;
         }
 
@@ -358,11 +359,15 @@
 
         function highlightSearch(text) {
             const searchInput = document.getElementById('searchInput');
-            if (!searchInput || !searchInput.value.trim()) return text;
+            const escaped = escapeHTML(text);
+            
+            if (!searchInput || !searchInput.value.trim()) return escaped;
 
             const searchTerm = searchInput.value.trim();
-            const regex = new RegExp(`(${searchTerm})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
+            // Escape special regex characters in search term
+            const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+            return escaped.replace(regex, '<span class="highlight">$1</span>');
         }
 
         window.markQuestion = function(index, status) {

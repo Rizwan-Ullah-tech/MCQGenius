@@ -86,18 +86,10 @@
 
     <script type="module">
         import coursesData from './data/courses.js';
+        import { escapeHTML } from './js/utils.js';
 
         let allQuestions = [];
         let filteredQuestions = [];
-
-        function escapeHTML(text) {
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDarkMode();
@@ -213,9 +205,9 @@
 
                 questionItem.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                        <div class="badge badge-primary">${q.courseName} - Semester ${q.semester}</div>
+                        <div class="badge badge-primary">${escapeHTML(q.courseName)} - Semester ${escapeHTML(String(q.semester))}</div>
                         <div class="badge" style="background: var(--color-gray-200); color: var(--color-gray-700);">
-                            ${q.bookTitle}
+                            ${escapeHTML(q.bookTitle)}
                         </div>
                     </div>
                     <div style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--color-gray-800);">

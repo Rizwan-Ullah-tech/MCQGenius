@@ -79,17 +79,9 @@
 
     <script type="module">
         import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
 
         let currentQuestions = [];
-
-        function escapeHTML(text) {
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDarkMode();
@@ -137,7 +129,7 @@
 
             // Generate preview
             const preview = document.getElementById('paperPreview');
-            const bookTitles = selectedBooks.map(b => b.title).join(', ');
+            const bookTitles = selectedBooks.map(b => escapeHTML(b.title)).join(', ');
             
             let questionsHTML = '';
             currentQuestions.forEach((q, index) => {
@@ -160,7 +152,7 @@
             preview.innerHTML = `
                 <div style="text-align: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--color-gray-300);">
                     <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">
-                        ${courseData.name} - Semester ${semesterData.semester}
+                        ${escapeHTML(courseData.name)} - Semester ${escapeHTML(String(semesterData.semester))}
                     </h1>
                     <p style="font-size: 1rem; color: var(--color-gray-600); margin-bottom: 1rem;">
                         ${bookTitles}
@@ -231,7 +223,7 @@
             const selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
             const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
             const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
-            const bookTitles = selectedBooks.map(b => b.title).join(', ');
+            const bookTitles = selectedBooks.map(b => escapeHTML(b.title)).join(', ');
 
             // Create new window for answer key
             const answerWindow = window.open('', '_blank');
@@ -239,7 +231,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Answer Key - ${courseData.name}</title>
+                    <title>Answer Key - ${escapeHTML(courseData.name)}</title>
                     <link rel="stylesheet" href="styles/main.css">
                     <style>
                         body {
@@ -285,7 +277,7 @@
                             ANSWER KEY - FOR TEACHER USE ONLY
                         </h1>
                         <p style="font-size: 1rem; color: #6b7280;">
-                            ${courseData.name} - Semester ${semesterData.semester}
+                            ${escapeHTML(courseData.name)} - Semester ${escapeHTML(String(semesterData.semester))}
                         </p>
                         <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
                             ${bookTitles}

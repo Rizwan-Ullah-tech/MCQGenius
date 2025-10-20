@@ -81,6 +81,8 @@
     </div>
 
     <script type="module">
+        import { escapeHTML } from './js/utils.js';
+
         document.addEventListener('DOMContentLoaded', () => {
             loadDarkMode();
             setupDarkModeToggle();
@@ -141,11 +143,11 @@
                     answerHTML = `
                         <div style="margin-top: 1rem; font-size: 0.875rem;">
                             <div style="color: ${q.isCorrect ? 'var(--color-success)' : 'var(--color-danger)'}; font-weight: 600;">
-                                <strong>Your answer:</strong> ${q.options[q.userAnswer]}
+                                <strong>Your answer:</strong> ${escapeHTML(q.options[q.userAnswer])}
                             </div>
                             ${!q.isCorrect ? `
                                 <div style="color: var(--color-success); font-weight: 600; margin-top: 0.5rem;">
-                                    <strong>Correct answer:</strong> ${q.options[q.correctAnswer]}
+                                    <strong>Correct answer:</strong> ${escapeHTML(q.options[q.correctAnswer])}
                                 </div>
                             ` : ''}
                         </div>
@@ -154,7 +156,7 @@
                     answerHTML = `
                         <div style="margin-top: 1rem; font-size: 0.875rem;">
                             <div style="color: var(--color-success); font-weight: 600;">
-                                <strong>Correct answer:</strong> ${q.options[q.correctAnswer]}
+                                <strong>Correct answer:</strong> ${escapeHTML(q.options[q.correctAnswer])}
                             </div>
                         </div>
                     `;
@@ -162,13 +164,13 @@
 
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                        <div class="badge badge-primary">${q.bookTitle}</div>
+                        <div class="badge badge-primary">${escapeHTML(q.bookTitle)}</div>
                         <div style="font-weight: 600; color: ${statusColor};">
                             ${statusIcon} ${statusText}
                         </div>
                     </div>
                     <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">
-                        ${index + 1}. ${q.question}
+                        ${index + 1}. ${escapeHTML(q.question)}
                     </div>
                     ${answerHTML}
                 `;

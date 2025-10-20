@@ -54,6 +54,8 @@
     </div>
 
     <script type="module">
+        import { escapeHTML } from './js/utils.js';
+        
         let selectedBooks = [];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -87,13 +89,13 @@
 
                 bookCard.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <input type="checkbox" class="form-checkbox book-checkbox" id="book-${book.id}" value="${book.id}">
-                        <label for="book-${book.id}" style="cursor: pointer; flex: 1; margin: 0;">
+                        <input type="checkbox" class="form-checkbox book-checkbox" id="book-${escapeHTML(book.id)}" value="${escapeHTML(book.id)}">
+                        <label for="book-${escapeHTML(book.id)}" style="cursor: pointer; flex: 1; margin: 0;">
                             <div style="font-size: 1.125rem; font-weight: 600; color: var(--color-gray-800); margin-bottom: 0.25rem;">
-                                ${book.title}
+                                ${escapeHTML(book.title)}
                             </div>
                             <div style="font-size: 0.875rem; color: var(--color-gray-600);">
-                                📖 ${book.author} • ❓ ${book.mcqs.length} Questions
+                                📖 ${escapeHTML(book.author)} • ❓ ${book.mcqs.length} Questions
                             </div>
                         </label>
                     </div>

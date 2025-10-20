@@ -84,6 +84,7 @@
 
     <script type="module">
         import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
 
         let allTests = [];
 
@@ -93,6 +94,7 @@
             loadHistory();
             setupFilters();
             setupClearButton();
+            setupTestButtons();
         });
 
         function loadHistory() {
@@ -135,7 +137,7 @@
             tests.forEach(test => {
                 const scoreClass = getScoreClass(test.percentage);
                 const testDate = new Date(test.timestamp).toLocaleString();
-                const booksList = test.books.map(b => b.title).join(', ');
+                const booksList = test.books.map(b => escapeHTML(b.title)).join(', ');
 
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item slide-in';
@@ -144,7 +146,7 @@
                     <div class="history-header">
                         <div>
                             <div class="badge badge-primary" style="margin-bottom: 0.5rem;">
-                                ${test.courseName} - Semester ${test.semester}
+                                ${escapeHTML(test.courseName)} - Semester ${escapeHTML(String(test.semester))}
                             </div>
                             <div class="badge ${test.testType === 'online' ? 'badge-success' : 'badge-info'}">
                                 ${test.testType === 'online' ? '🎯 Online Test' : '🖨️ Printed Paper'}
@@ -158,20 +160,20 @@
                         📚 ${booksList}
                     </div>
                     <div style="font-size: 0.75rem; color: var(--color-gray-500); margin-bottom: 1rem;">
-                        📅 ${testDate}
+                        📅 ${escapeHTML(testDate)}
                         ${test.timeTaken ? ` • ⏱️ ${formatTime(test.timeTaken)}` : ''}
                     </div>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         ${test.testType === 'online' ? `
-                            <button class="btn btn-sm btn-primary" onclick="viewDetails('${test.id}')">
+                            <button class="btn btn-sm btn-primary view-details-btn" data-test-id="${escapeHTML(test.id)}">
                                 👁️ View Results
                             </button>
                         ` : `
-                            <button class="btn btn-sm btn-success" onclick="checkAnswers('${test.id}')">
+                            <button class="btn btn-sm btn-success check-answers-btn" data-test-id="${escapeHTML(test.id)}">
                                 ✅ Check Answers
                             </button>
                         `}
-                        <button class="btn btn-sm btn-danger" onclick="deleteTest('${test.id}')">
+                        <button class="btn btn-sm btn-danger delete-test-btn" data-test-id="${escapeHTML(test.id)}">
                             🗑️ Delete
                         </button>
                     </div>
@@ -211,6 +213,24 @@
                 if (confirm('⚠️ Are you sure you want to delete all test history? This cannot be undone.')) {
                     testStorage.clearAll();
                     window.location.reload();
+                }
+            });
+        }
+
+        function setupTestButtons() {
+            // Event delegation for test buttons
+            document.getElementById('historyContainer').addEventListener('click', (e) => {
+                const target = e.target;
+                const testId = target.dataset.testId;
+                
+                if (!testId) return;
+                
+                if (target.classList.contains('view-details-btn')) {
+                    viewDetails(testId);
+                } else if (target.classList.contains('check-answers-btn')) {
+                    checkAnswers(testId);
+                } else if (target.classList.contains('delete-test-btn')) {
+                    deleteTest(testId);
                 }
             });
         }

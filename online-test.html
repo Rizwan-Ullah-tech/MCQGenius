@@ -148,20 +148,12 @@
 
     <script type="module">
         import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
 
         let questions = [];
         let userAnswers = {};
         let startTime = new Date();
         let timerInterval = null;
-
-        function escapeHTML(text) {
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDarkMode();
@@ -221,7 +213,7 @@
 
                 questionCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                        <div class="badge badge-primary">${question.bookTitle}</div>
+                        <div class="badge badge-primary">${escapeHTML(question.bookTitle)}</div>
                         <div class="badge" style="background: var(--color-gray-200); color: var(--color-gray-700);">
                             Question ${index + 1}/20
                         </div>
