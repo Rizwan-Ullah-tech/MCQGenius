@@ -4,6 +4,29 @@
 A comprehensive multi-page MCQ (Multiple Choice Questions) exam management system for creating, taking, and managing tests. The system supports multiple courses, semesters, and provides both online testing and printable question papers.
 
 ## Recent Changes
+- **October 20, 2025: Major Security & Bug Fixes**
+  - **CRITICAL BUGS FIXED:**
+    - ✅ Fixed print-paper.html JavaScript rendering as plain text (caused by `</script>` in option data)
+    - ✅ Fixed invisible answers in Question Bank (HTML tags like `<canvas>`, `<svg>` were being interpreted)
+    - ✅ Fixed option visibility issues in online tests (nested options, invisible text)
+  
+  - **SECURITY HARDENING:**
+    - Created shared `js/utils.js` with centralized escapeHTML function
+    - Fixed 26 XSS vulnerabilities across 7 HTML files
+    - Replaced vulnerable inline onclick handlers with secure event delegation
+    - All innerHTML insertions now properly escape user-controlled data
+  
+  - **FILES MODIFIED:**
+    - `js/utils.js` - NEW: Shared HTML escaping utility
+    - `print-paper.html` - 8 XSS fixes + script termination bug fix
+    - `question-bank.html` - 3 XSS fixes
+    - `online-test.html` - 1 XSS fix
+    - `test-results.html` - 4 XSS fixes
+    - `comparison.html` - Multiple fixes including highlightSearch security
+    - `index.html` - 4 XSS fixes
+    - `books.html` - 4 XSS fixes
+    - `history.html` - 5 XSS fixes + inline onclick handler security fix
+
 - October 20, 2025: Project analysis and cleanup
   - Removed unused app.js (old single-page system, backed up as app.js.backup)
   - Updated documentation to reflect current multi-page architecture
@@ -31,6 +54,7 @@ A comprehensive multi-page MCQ (Multiple Choice Questions) exam management syste
 ### Supporting Files
 - `styles/main.css` - Global CSS with custom properties for theming
 - `js/test-storage.js` - LocalStorage management for test history
+- `js/utils.js` - **NEW**: Shared utilities (HTML escaping for security)
 - `parse_mcqs.py` - Python script to parse text files into JS modules
 
 ## User Preferences
@@ -38,6 +62,7 @@ A comprehensive multi-page MCQ (Multiple Choice Questions) exam management syste
 - Professional UI with consistent design
 - Dark mode support across all pages
 - Client-side only (no backend required)
+- Security-first approach (all user data properly escaped)
 
 ## Architecture
 ### Navigation Flow
@@ -51,18 +76,22 @@ A comprehensive multi-page MCQ (Multiple Choice Questions) exam management syste
 - **Question Bank**: Search and filter 714+ questions by course/semester
 - **Test History**: Separate tracking for online tests and printed papers
 - **Answer Checking**: Manual marking system for printed papers
+- **Security**: All user data properly escaped to prevent XSS attacks
 
 ### Data Management
 - All test data stored in browser's localStorage
 - No server-side processing required
 - ES6 modules for clean data separation
 - Supports multiple courses with 6 semesters each
+- All dynamic content properly sanitized for security
 
 ## Technical Notes
 - Uses ES6 module imports (requires proper MIME type handling)
 - Python HTTP server serves files with correct MIME types
 - Dark mode state persisted in localStorage
 - Responsive design works on desktop and tablet devices
+- **Security**: Centralized HTML escaping prevents XSS attacks
+- **Security**: Event delegation replaces vulnerable inline onclick handlers
 
 ## Known Issues
 - jQuery.cdn 404 error in console (appears to be from browser extension, not affecting functionality)
@@ -74,3 +103,10 @@ A comprehensive multi-page MCQ (Multiple Choice Questions) exam management syste
 - Access at: http://localhost:5000
 - No build process required
 - All client-side code, works offline after initial load
+
+## Security Features
+- Centralized escapeHTML utility in `js/utils.js`
+- All innerHTML insertions escape user-controlled data
+- Event delegation for secure button handling
+- HTML tags in questions/options display as text (not executed)
+- Prevents XSS, HTML injection, and script execution attacks
