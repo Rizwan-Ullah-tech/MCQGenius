@@ -1,2 +1,4 @@
-.DS_Store
-*.log
+.replit
+replit.nix
+
+.git.backup.*
