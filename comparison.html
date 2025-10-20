@@ -253,6 +253,7 @@
             loadTest();
             setupSearch();
             setupResetButton();
+            setupMarkingButtons();
         });
 
         function loadTest() {
@@ -339,15 +340,15 @@
                             Mark as:
                         </span>
                         <button class="mark-btn ${marking[actualIndex] === 'correct' ? 'correct' : ''}" 
-                                onclick="markQuestion(${actualIndex}, 'correct')">
+                                data-question-index="${actualIndex}" data-mark-type="correct">
                             ✅ Correct
                         </button>
                         <button class="mark-btn ${marking[actualIndex] === 'wrong' ? 'wrong' : ''}" 
-                                onclick="markQuestion(${actualIndex}, 'wrong')">
+                                data-question-index="${actualIndex}" data-mark-type="wrong">
                             ❌ Wrong
                         </button>
                         <button class="mark-btn ${marking[actualIndex] === 'unanswered' ? 'unanswered' : ''}" 
-                                onclick="markQuestion(${actualIndex}, 'unanswered')">
+                                data-question-index="${actualIndex}" data-mark-type="unanswered">
                             ⚪ Unanswered
                         </button>
                     </div>
@@ -370,7 +371,18 @@
             return escaped.replace(regex, '<span class="highlight">$1</span>');
         }
 
-        window.markQuestion = function(index, status) {
+        function setupMarkingButtons() {
+            const container = document.getElementById('questionsContainer');
+            container.addEventListener('click', (e) => {
+                if (e.target.classList.contains('mark-btn')) {
+                    const index = parseInt(e.target.dataset.questionIndex);
+                    const status = e.target.dataset.markType;
+                    markQuestion(index, status);
+                }
+            });
+        }
+
+        function markQuestion(index, status) {
             marking[index] = status;
             
             // Update button states
@@ -389,7 +401,7 @@
             }
 
             updateScore();
-        };
+        }
 
         function updateScore() {
             let correct = 0;

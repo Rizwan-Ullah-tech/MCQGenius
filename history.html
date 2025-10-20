@@ -235,24 +235,24 @@
             });
         }
 
-        window.viewDetails = function(testId) {
+        function viewDetails(testId) {
             const test = testStorage.getById(testId);
             if (test) {
                 localStorage.setItem('currentTestResults', JSON.stringify(test));
                 window.location.href = 'test-results.html';
             }
-        };
+        }
 
-        window.checkAnswers = function(testId) {
+        function checkAnswers(testId) {
             window.location.href = `comparison.html?testId=${testId}`;
-        };
+        }
 
-        window.deleteTest = function(testId) {
+        function deleteTest(testId) {
             if (confirm('⚠️ Are you sure you want to delete this test?')) {
                 testStorage.deleteTest(testId);
                 window.location.reload();
             }
-        };
+        }
 
         function getScoreClass(percentage) {
             if (percentage >= 80) return 'score-excellent';

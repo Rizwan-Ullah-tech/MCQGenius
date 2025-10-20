@@ -1,4 +1,4 @@
-import json
+
 import re
 
 def parse_mcq_file(filename):
@@ -132,11 +132,52 @@ def parse_mcq_file(filename):
     
     return books
 
+def format_js_value(value, indent=0):
+    """Format a Python value as JavaScript code"""
+    spaces = '  ' * indent
+    
+    if isinstance(value, str):
+        # Escape special characters in strings
+        escaped = value.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+        return f'"{escaped}"'
+    elif isinstance(value, bool):
+        return 'true' if value else 'false'
+    elif isinstance(value, (int, float)):
+        return str(value)
+    elif isinstance(value, list):
+        if not value:
+            return '[]'
+        items = ',\n'.join(f"{spaces}  {format_js_value(item, indent + 1)}" for item in value)
+        return f'[\n{items}\n{spaces}]'
+    elif isinstance(value, dict):
+        if not value:
+            return '{}'
+        items = ',\n'.join(
+            f'{spaces}  "{key}": {format_js_value(val, indent + 1)}'
+            for key, val in value.items()
+        )
+        return f'{{\n{items}\n{spaces}}}'
+    else:
+        return 'null'
+
+def write_js_file(semester_num, books, output_file):
+    """Write data as a JavaScript module file"""
+    semester_data = {
+        'semester': semester_num,
+        'books': books
+    }
+    
+    # Generate JavaScript module content
+    js_content = f"const semester{semester_num}Data = {format_js_value(semester_data)};\n\nexport default semester{semester_num}Data;\n"
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(js_content)
+
 # Parse all semester files
 semester_files = [
-    ('attached_assets/SEMESTER 1 CPISM_1760689364054.txt', 1, 'data/semester1.json'),
-    ('attached_assets/SEMESTER 2 DISM_1760689364055.txt', 2, 'data/semester2.json'),
-    ('attached_assets/SEMESTER 3 HDSE I_1760689364055.txt', 3, 'data/semester3.json')
+    ('attached_assets/SEMESTER 1 CPISM_1760689364054.txt', 1, 'data/semester1.js'),
+    ('attached_assets/SEMESTER 2 DISM_1760689364055.txt', 2, 'data/semester2.js'),
+    ('attached_assets/SEMESTER 3 HDSE I_1760689364055.txt', 3, 'data/semester3.js')
 ]
 
 for input_file, semester_num, output_file in semester_files:
@@ -146,13 +187,7 @@ for input_file, semester_num, output_file in semester_files:
     
     books = parse_mcq_file(input_file)
     
-    semester_data = {
-        'semester': semester_num,
-        'books': books
-    }
-    
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(semester_data, f, indent=2, ensure_ascii=False)
+    write_js_file(semester_num, books, output_file)
     
     print(f"\nSaved {len(books)} books to {output_file}")
     total_mcqs = sum(len(book['mcqs']) for book in books)
