@@ -10,7 +10,7 @@ const coursesData = {
         {
             id: "accp-7144-ai",
             name: "ACCP-7144-AI",
-            fullName: "Advanced Certificate in Computer Programming - AI Track",
+            fullName: "Aptech Certified Computer Professional - AI Track",
             description: "Comprehensive AI and Software Development Program",
             icon: "🤖",
             color: "#10b981",
@@ -39,7 +39,7 @@ const coursesData = {
         {
             id: "accp-7062-prime",
             name: "ACCP-7062-Prime2.0",
-            fullName: "Advanced Certificate in Computer Programming - Prime 2.0",
+            fullName: "Aptech Certified Computer Professional - Prime 2.0",
             description: "Enhanced Software Development Program",
             icon: "💎",
             color: "#3b82f6",
