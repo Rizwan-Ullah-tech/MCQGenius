@@ -124,3 +124,28 @@ Open an issue on GitHub or email Rizwan.ullah.tech@gmail.com
 
 ---
 Made for education
+
+```
+MCQ-Exam-System
+├─ books.html
+├─ comparison.html
+├─ data
+│  ├─ courses.js
+│  ├─ semester1.js
+│  ├─ semester2.js
+│  └─ semester3.js
+├─ history.html
+├─ index.html
+├─ js
+│  ├─ test-storage.js
+│  └─ utils.js
+├─ online-test.html
+├─ parse_mcqs.py
+├─ print-paper.html
+├─ question-bank.html
+├─ semester.html
+├─ styles
+│  └─ main.css
+└─ test-results.html
+
+```
