@@ -125,6 +125,7 @@ Open an issue on GitHub or email Rizwan.ullah.tech@gmail.com
 ---
 Made for education
 
+
 ```
 MCQ-Exam-System
 ├─ books.html
@@ -134,6 +135,7 @@ MCQ-Exam-System
 │  ├─ semester1.js
 │  ├─ semester2.js
 │  └─ semester3.js
+├─ generate_data_inserts.py
 ├─ history.html
 ├─ index.html
 ├─ js
