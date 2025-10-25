@@ -777,6 +777,463 @@ const semester1Data = {
         answer: "Link-Building Tools"
       }
     ]
+  },
+  "Frontend Technologies for Beginners": {
+    "Session 1": [
+      {
+        question: "What was the year HTML was introduced?",
+        options: ["1997", "1990", "2000", "1985"],
+        answer: "1990"
+      },
+      {
+        question: "Which organization recommended HTML5 as a standard in 1997?",
+        options: ["WHATWG", "IEEE", "W3C", "ISO"],
+        answer: "W3C"
+      },
+      {
+        question: "Which of the following is defined as the largest Wide Area Network (WAN)?",
+        options: ["LAN", "The Web", "The Internet", "MAN"],
+        answer: "The Internet"
+      },
+      {
+        question: "What is the primary protocol used by a web browser to retrieve a web page from a server?",
+        options: ["FTP", "TCP/IP", "HTTP", "SMTP"],
+        answer: "HTTP"
+      },
+      {
+        question: "What is a key characteristic of a Static Web Page?",
+        options: ["Content is always up-to-date.", "It allows user interaction.", "Contents remain unchanged.", "It generates content on-demand."],
+        answer: "Contents remain unchanged."
+      },
+      {
+        question: "Which technology is a scripting language used for creating dynamic Web pages?",
+        options: ["CSS", "HTML", "JavaScript", "XHTML"],
+        answer: "JavaScript"
+      },
+      {
+        question: "According to the basic rules for HTML5, the introduction of new features should be based on:",
+        options: ["PHP and SQL", "HTML, CSS, DOM, and JavaScript", "Flash and Silverlight", "XHTML and XML"],
+        answer: "HTML, CSS, DOM, and JavaScript"
+      },
+      {
+        question: "Which HTML5 element is used for drawing graphics?",
+        options: ["<draw>", "<graphic>", "<svg>", "<canvas>"],
+        answer: "<canvas>"
+      },
+      {
+        question: "What is the primary purpose of CSS?",
+        options: ["To add interactivity to web pages", "To structure the content of a web page", "To separate content from its formatting", "To connect to a database"],
+        answer: "To separate content from its formatting"
+      },
+      {
+        question: "Which of the following is a benefit of using CSS?",
+        options: ["More HTML code", "Code Re-usability", "Device Dependence", "Complex syntax"],
+        answer: "Code Re-usability"
+      },
+      {
+        question: "Which of these is a functionality of JavaScript?",
+        options: ["Specifying the character encoding for a page", "Creating a 2D drawable surface without plug-ins", "Defining the association with an external stylesheet", "Declaring the version of HTML"],
+        answer: "Creating a 2D drawable surface without plug-ins"
+      },
+      {
+        question: "jQuery is best described as:",
+        options: ["A programming language", "A CSS framework", "A JavaScript library", "A server-side technology"],
+        answer: "A JavaScript library"
+      },
+      {
+        question: "What is the correct syntax for the HTML5 DOCTYPE declaration?",
+        options: ["<!DOCTYPE HTML5>", '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML5//EN">', "<!DOCTYPE html>", "</DOCTYPE html5>"],
+        answer: "<!DOCTYPE html>"
+      },
+      {
+        question: "In HTML5, which attribute is no longer necessary in the <link> tag when linking a stylesheet?",
+        options: ["rel", "href", "type", "src"],
+        answer: "type"
+      },
+      {
+        question: "Which data type specifies the spacing among HTML elements?",
+        options: ["Colors", "Content Types", "URIs", "Lengths"],
+        answer: "Lengths"
+      },
+      {
+        question: "Which global attribute in HTML5 specifies whether an element can be dragged?",
+        options: ["dir", "dropzone", "draggable", "contextmenu"],
+        answer: "draggable"
+      },
+      {
+        question: "Which entity would you use to display the copyright symbol (©) on a web page?",
+        options: ["&copy;", "&copyright;", "&c;", "&rights;"],
+        answer: "&copy;"
+      },
+      {
+        question: "What is a key characteristic of a standalone tag?",
+        options: ["It contains a start tag, content, and an end tag.", "It consists of a start tag and attributes, followed by /> without any content.", "It is the largest container element.", "It always contains sub-elements."],
+        answer: "It consists of a start tag and attributes, followed by /> without any content."
+      },
+      {
+        question: "A major benefit of using HTML5 for mobile development is:",
+        options: ["Increased dependency on third-party plug-ins.", "Higher development costs for different platforms.", "Compatibility with most operating system platforms.", "The necessity for in-depth native programming knowledge."],
+        answer: "Compatibility with most operating system platforms."
+      },
+      {
+        question: "Which of the following is a new semantic element introduced in HTML5?",
+        options: ["<div>", "<span>", "<header>", "<table>"],
+        answer: "<header>"
+      }
+    ],
+    "Session 2": [
+      {
+        question: "What is the top-level heading element in HTML?",
+        options: ["<h2>", "<h4>", "<h1>", "<h6>"],
+        answer: "<h1>"
+      },
+      {
+        question: "Which tag is used to display text in bold?",
+        options: ["<i>", "<strong>", "<b>", "Both b and c"],
+        answer: "Both b and c"
+      },
+      {
+        question: "The <pre> tag is used for:",
+        options: ["Predefined text", "Preformatted text", "Preferred text", "Preliminary text"],
+        answer: "Preformatted text"
+      },
+      {
+        question: "Which attribute is used to specify the URL in a hyperlink?",
+        options: ["src", "link", "href", "url"],
+        answer: "href"
+      },
+      {
+        question: 'What does the target="_blank" attribute do?',
+        options: ["Opens the link in the same tab", "Opens the link in the parent frame", "Opens the link in a new, blank window or tab", "Opens the link in the full body of the window"],
+        answer: "Opens the link in a new, blank window or tab"
+      },
+      {
+        question: "Which HTML5 tag is used to define independent, self-contained content?",
+        options: ["<section>", "<article>", "<aside>", "<nav>"],
+        answer: "<article>"
+      },
+      {
+        question: "The <nav> element is intended for:",
+        options: ["Main content of the page", "Navigation links", "Sidebar content", "Footer information"],
+        answer: "Navigation links"
+      },
+      {
+        question: "Which new HTML5 input type is used for entering an email address?",
+        options: ["text", "email", "mail", "url"],
+        answer: "email"
+      },
+      {
+        question: "The required attribute in a form input field:",
+        options: ["Provides a default value", "Specifies a hint for the user", "Validates that the field is not empty", "Hides the field from the user"],
+        answer: "Validates that the field is not empty"
+      },
+      {
+        question: "A hidden field in a form is defined using:",
+        options: ['<input type="password">', '<input type="hidden">', "<hidden>", '<input type="secure">'],
+        answer: '<input type="hidden">'
+      },
+      {
+        question: "Which attribute is used to merge table cells across multiple columns?",
+        options: ["rowspan", "colspan", "cellspan", "merge"],
+        answer: "colspan"
+      },
+      {
+        question: "The <caption> tag is used to:",
+        options: ["Add a title to a table", "Add a header to a table column", "Add a footer to a table", "Define a table cell"],
+        answer: "Add a title to a table"
+      },
+      {
+        question: "Which tag is used to embed audio in an HTML5 page?",
+        options: ["<music>", "<mp3>", "<audio>", "<sound>"],
+        answer: "<audio>"
+      },
+      {
+        question: "The controls attribute in the <video> tag:",
+        options: ["Automatically plays the video", "Loops the video", "Displays video playback controls", "Mutes the video"],
+        answer: "Displays video playback controls"
+      },
+      {
+        question: "The <track> element is used to specify:",
+        options: ["The source file for the video", "Text tracks for video/audio (like subtitles)", "The playback speed", "The video dimensions"],
+        answer: "Text tracks for video/audio (like subtitles)"
+      },
+      {
+        question: "The <canvas> element in HTML5 is used for:",
+        options: ["Playing videos", "Drawing graphics via JavaScript", "Creating form inputs", "Displaying 3D models"],
+        answer: "Drawing graphics via JavaScript"
+      },
+      {
+        question: "The Geolocation API is used to:",
+        options: ["Get the user's geographical location", "Locate the nearest server", "Find the IP address of a website", "Track user clicks"],
+        answer: "Get the user's geographical location"
+      },
+      {
+        question: "For a drag-and-drop operation, which attribute must be set to true on a draggable element?",
+        options: ["draggable", "dragable", "dropzone", "ondrag"],
+        answer: "draggable"
+      },
+      {
+        question: "The dataTransfer object is used in drag-and-drop to:",
+        options: ["Store the data being dragged", "Change the cursor style", "Animate the element", "Validate the drop target"],
+        answer: "Store the data being dragged"
+      },
+      {
+        question: "The Application Cache (AppCache) is used to:",
+        options: ["Run Web applications offline", "Increase server security", "Compress images", "Manage user sessions"],
+        answer: "Run Web applications offline"
+      }
+    ],
+    "Session 3": [
+      {
+        question: "CSS stands for:",
+        options: ["Creative Style Sheets", "Cascading Style Sheets", "Computer Style Sheets", "Colorful Style Sheets"],
+        answer: "Cascading Style Sheets"
+      },
+      {
+        question: "Which of the following is a relative length unit in CSS?",
+        options: ["px", "em", "cm", "in"],
+        answer: "em"
+      },
+      {
+        question: "Where is an internal/embedded style sheet placed in an HTML document?",
+        options: ["In the <body> section", "In the <head> section", "In a separate .css file", "In the <footer> section"],
+        answer: "In the <head> section"
+      },
+      {
+        question: "Which selector has the highest specificity?",
+        options: ["Type Selector (e.g., p)", "Class Selector (e.g., .intro)", "ID Selector (e.g., #header)", "Universal Selector (e.g., *)"],
+        answer: "ID Selector (e.g., #header)"
+      },
+      {
+        question: "The a:hover pseudo-class applies a style when:",
+        options: ["The link has been visited", "The user mouses over the link", "The link is active (being clicked)", "The link is the first child"],
+        answer: "The user mouses over the link"
+      },
+      {
+        question: "Which property is used to change the text color?",
+        options: ["text-color", "color", "font-color", "text-style"],
+        answer: "color"
+      },
+      {
+        question: "The text-align: justify; property will:",
+        options: ["Align text to the left", "Align text to the right", "Center the text", "Stretch the text to fit the container's width"],
+        answer: "Stretch the text to fit the container's width"
+      },
+      {
+        question: "The CSS Box Model consists of:",
+        options: ["Margin, Border, Padding, Content", "Header, Footer, Content, Border", "Top, Right, Bottom, Left", "Width, Height, Depth, Color"],
+        answer: "Margin, Border, Padding, Content"
+      },
+      {
+        question: "Which property is used to create space between the element's content and its border?",
+        options: ["margin", "spacing", "padding", "border-space"],
+        answer: "padding"
+      },
+      {
+        question: "The float property can be set to:",
+        options: ["left, right, center", "left, right, none", "top, bottom, middle", "up, down, none"],
+        answer: "left, right, none"
+      },
+      {
+        question: "Which graphic format uses lossless compression and supports transparency?",
+        options: ["JPEG", "GIF", "PNG", "BMP"],
+        answer: "PNG"
+      },
+      {
+        question: "The <img> tag is:",
+        options: ["A container element", "An empty element", "A formatting element", "A deprecated element"],
+        answer: "An empty element"
+      },
+      {
+        question: "Which CSS property is used to create a transition effect?",
+        options: ["transform", "animation", "transition", "change"],
+        answer: "transition"
+      },
+      {
+        question: "The @keyframes rule is used in:",
+        options: ["CSS Transitions", "CSS Animations", "CSS Transformations", "CSS Positioning"],
+        answer: "CSS Animations"
+      },
+      {
+        question: "To make a Web page responsive for mobile devices, a developer can use:",
+        options: ["Media Queries", "Cookies", "Web Storage", "Geolocation API"],
+        answer: "Media Queries"
+      },
+      {
+        question: "Flexbox is primarily used for:",
+        options: ["Two-dimensional layouts", "One-dimensional layouts", "Table-based layouts", "Fixed layouts"],
+        answer: "One-dimensional layouts"
+      },
+      {
+        question: "Which property is used to align flex items along the main axis?",
+        options: ["align-items", "justify-content", "flex-align", "content-justify"],
+        answer: "justify-content"
+      },
+      {
+        question: "CSS Grid Layout is used for:",
+        options: ["One-dimensional layouts", "Two-dimensional layouts", "Linear layouts", "Inline layouts"],
+        answer: "Two-dimensional layouts"
+      },
+      {
+        question: "The grid-template-columns property defines:",
+        options: ["The number of rows", "The size of the columns", "The gap between rows", "The alignment of the grid"],
+        answer: "The size of the columns"
+      },
+      {
+        question: "In a grid container, the grid-gap property sets the gap between:",
+        options: ["Rows only", "Columns only", "Both rows and columns", "The grid and its container"],
+        answer: "Both rows and columns"
+      },
+      {
+        question: "The CSS subgrid value allows:",
+        options: ["A child grid to align with its parent grid", "Creating a grid within a flexbox", "Making a grid responsive", "Hiding grid items"],
+        answer: "A child grid to align with its parent grid"
+      },
+      {
+        question: "The accent-color property is used to style:",
+        options: ["The background of a page", "Form elements like checkboxes and radio buttons", "The text color of headings", "The border of images"],
+        answer: "Form elements like checkboxes and radio buttons"
+      },
+      {
+        question: "The :has() pseudo-class allows selection of a parent based on its:",
+        options: ["Siblings", "Children", "Ancestors", "Descendants"],
+        answer: "Children"
+      },
+      {
+        question: "Viewport units (vw, vh) are relative to:",
+        options: ["The parent element's size", "The root element's font size", "The size of the browser viewport", "The screen's pixel density"],
+        answer: "The size of the browser viewport"
+      },
+      {
+        question: "CSS Nesting allows you to:",
+        options: ["Nest media queries inside selectors", "Nest selectors inside other selectors", "Nest HTML elements inside CSS", "Nest JavaScript inside CSS"],
+        answer: "Nest selectors inside other selectors"
+      },
+      {
+        question: "A responsive Web design aims to:",
+        options: ["Make Websites look the same on all devices", "Provide an optimal viewing experience across a wide range of devices", "Load faster on mobile networks", "Use only HTML5 and no CSS"],
+        answer: "Provide an optimal viewing experience across a wide range of devices"
+      },
+      {
+        question: "Which CSS technique is crucial for creating responsive layouts?",
+        options: ["Media Queries", "CSS Animations", "Text Shadows", "Font Faces"],
+        answer: "Media Queries"
+      },
+      {
+        question: 'The "mobile-first" design approach means:',
+        options: ["Designing for desktop first and then adapting for mobile", "Designing for mobile devices first and then scaling up for larger screens", "Designing only for mobile phones", "Using mobile-specific HTML tags"],
+        answer: "Designing for mobile devices first and then scaling up for larger screens"
+      }
+    ],
+    "Session 4": [
+      {
+        question: "JavaScript is a ______ language.",
+        options: ["Compiled", "Scripting", "Markup", "Styling"],
+        answer: "Scripting"
+      },
+      {
+        question: "Which keyword is used to declare a variable in JavaScript?",
+        options: ["var", "variable", "int", "declare"],
+        answer: "var"
+      },
+      {
+        question: 'What will document.write("Hello"); do?',
+        options: ['Display an alert box with "Hello"', 'Write "Hello" to the HTML document', 'Print "Hello" to the console', 'Store "Hello" in a variable'],
+        answer: 'Write "Hello" to the HTML document'
+      },
+      {
+        question: "Which method is used to call a function when an event occurs on an element?",
+        options: ["addEventListener()", "callFunction()", "triggerEvent()", "eventCall()"],
+        answer: "addEventListener()"
+      },
+      {
+        question: "The === operator in JavaScript checks for:",
+        options: ["Value equality only", "Type equality only", "Both value and type equality", "Neither value nor type equality"],
+        answer: "Both value and type equality"
+      },
+      {
+        question: "A function in JavaScript is defined using the keyword:",
+        options: ["function", "def", "method", "func"],
+        answer: "function"
+      },
+      {
+        question: "What does the return statement do in a function?",
+        options: ["Stops the function's execution", "Returns a value from the function", "Both a and b", "Prints the value to the console"],
+        answer: "Both a and b"
+      },
+      {
+        question: "The Document Object Model (DOM) represents an HTML document as a:",
+        options: ["Linear list", "Tree structure", "Grid layout", "Stack of elements"],
+        answer: "Tree structure"
+      },
+      {
+        question: "JSON stands for:",
+        options: ["JavaScript Object Notation", "JavaScript Online Network", "Java Standard Object Naming", "JavaScript Oriented Notation"],
+        answer: "JavaScript Object Notation"
+      },
+      {
+        question: "A JavaScript Promise represents the eventual completion or failure of a(n):",
+        options: ["Synchronous operation", "Asynchronous operation", "Conditional operation", "Logical operation"],
+        answer: "Asynchronous operation"
+      },
+      {
+        question: "What does the top-level await feature allow?",
+        options: ["Using await outside of an async function in modules", "Using await in loops", "Making all functions asynchronous by default", "Waiting for the entire page to load"],
+        answer: "Using await outside of an async function in modules"
+      },
+      {
+        question: "How is a private class field defined in JavaScript?",
+        options: ["By using the private keyword", "By prefixing the field name with a #", "By placing it inside a private block", "By using the _ (underscore) convention"],
+        answer: "By prefixing the field name with a #"
+      },
+      {
+        question: "The Object.hasOwn() method is a modern replacement for:",
+        options: ["Object.hasProperty()", "Object.has()", "Object.hasOwnProperty()", "Object.contain()"],
+        answer: "Object.hasOwnProperty()"
+      },
+      {
+        question: "Which method is used to draw a line on a canvas?",
+        options: ["drawLine()", "lineTo()", "createLine()", "addLine()"],
+        answer: "lineTo()"
+      },
+      {
+        question: "Which Web Storage type persists data even after the browser is closed?",
+        options: ["Session Storage", "Local Storage", "Cookie Storage", "Cache Storage"],
+        answer: "Local Storage"
+      },
+      {
+        question: "The sessionStorage object stores data for:",
+        options: ["One session (until the browser tab is closed)", "Forever", "24 hours", "Until the user logs out"],
+        answer: "One session (until the browser tab is closed)"
+      },
+      {
+        question: "IndexedDB is a:",
+        options: ["Server-side relational database", "Client-side NoSQL database", "Cloud storage API", "Cookie management system"],
+        answer: "Client-side NoSQL database"
+      },
+      {
+        question: "Which method is used to get the user's current position?",
+        options: ["getLocation()", "getCurrentPosition()", "findPosition()", "locateUser()"],
+        answer: "getCurrentPosition()"
+      }
+    ],
+    "Session 5": [
+      {
+        question: "Which of the following is a key feature of jQuery?",
+        options: ["Event Handling", "DOM Manipulation", "Animations", "All of the above"],
+        answer: "All of the above"
+      },
+      {
+        question: "The jQuery hover() event is a combination of which two events?",
+        options: ["click and dblclick", "mouseenter and mouseleave", "focus and blur", "keydown and keyup"],
+        answer: "mouseenter and mouseleave"
+      },
+      {
+        question: "Which tool is commonly used by developers to test mobile views?",
+        options: ["Browser Developer Tools (e.g., Chrome DevTools)", "Microsoft Word", "Adobe Photoshop", "Windows File Explorer"],
+        answer: "Browser Developer Tools (e.g., Chrome DevTools)"
+      }
+    ]
   }
   },
   isEmpty: false
