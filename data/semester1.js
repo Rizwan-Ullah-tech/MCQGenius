@@ -1,7 +1,7 @@
 const semester1Data = {
   semester: 1,
   name: "CPISM (Semester 1)",
-  books: {
+  booksBySession: {
   "An Essential Guide to Git and GitHub": {
     "Session 1": [
       {
@@ -1236,7 +1236,35 @@ const semester1Data = {
     ]
   }
   },
+  books: [],
   isEmpty: false
 };
+
+function flattenSessions(booksBySession) {
+  const booksArray = [];
+  let bookId = 1;
+  
+  for (const [bookTitle, sessions] of Object.entries(booksBySession)) {
+    const allMcqs = [];
+    
+    for (const [sessionName, questions] of Object.entries(sessions)) {
+      allMcqs.push(...questions);
+    }
+    
+    booksArray.push({
+      id: `book${bookId}`,
+      title: bookTitle,
+      author: "ACCP",
+      mcqs: allMcqs,
+      sessions: sessions
+    });
+    
+    bookId++;
+  }
+  
+  return booksArray;
+}
+
+semester1Data.books = flattenSessions(semester1Data.booksBySession);
 
 export default semester1Data;
