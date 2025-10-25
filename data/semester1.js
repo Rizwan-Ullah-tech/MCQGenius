@@ -777,6 +777,7 @@ const semester1Data = {
         answer: "Link-Building Tools"
       }
     ]
+  }
   },
   isEmpty: false
 };
