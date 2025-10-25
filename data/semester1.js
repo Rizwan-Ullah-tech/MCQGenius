@@ -1,4 +1,7 @@
-const CPISM = {
+const semester1Data = {
+  semester: 1,
+  name: "CPISM (Semester 1)",
+  books: {
   "An Essential Guide to Git and GitHub": {
     "Session 1": [
       {
@@ -774,7 +777,8 @@ const CPISM = {
         answer: "Link-Building Tools"
       }
     ]
-  }
+  },
+  isEmpty: false
 };
 
-export default CPISM;
+export default semester1Data;
