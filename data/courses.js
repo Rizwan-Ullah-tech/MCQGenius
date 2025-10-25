@@ -1,10 +1,6 @@
 // Course data structure for MCQ Exam Management System
 // Two courses: ACCP-7062-Prime2.0 and ACCP-7144-AI
 
-import semester1Data from './semester1.js';
-import semester2Data from './semester2.js';
-import semester3Data from './semester3.js';
-
 const coursesData = {
     courses: [
         {
@@ -15,10 +11,21 @@ const coursesData = {
             icon: "🤖",
             color: "#10b981",
             semesters: [
-                semester1Data,
-                semester2Data,
-                semester3Data,
-                // Placeholders for future semesters
+                {
+                    semester: 1,
+                    books: [],
+                    isEmpty: true
+                },
+                {
+                    semester: 2,
+                    books: [],
+                    isEmpty: true
+                },
+                {
+                    semester: 3,
+                    books: [],
+                    isEmpty: true
+                },
                 {
                     semester: 4,
                     books: [],
