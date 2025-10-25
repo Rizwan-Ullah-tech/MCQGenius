@@ -43,7 +43,7 @@ const coursesData = {
                 },
                 {
                     semester: 6,
-                    name: "ADSE II (Semester 6)",
+                    name: "ADSE II",
                     books: [],
                     isEmpty: true
                 }
@@ -59,37 +59,37 @@ const coursesData = {
             semesters: [
                 {
                     semester: 1,
-                    name: "CPISM (Semester 1)",
+                    name: "CPISM",
                     books: [],
                     isEmpty: true
                 },
                 {
                     semester: 2,
-                    name: "DISM (Semester 2)",
+                    name: "DISM",
                     books: [],
                     isEmpty: true
                 },
                 {
                     semester: 3,
-                    name: "HDSE I (Semester 3)",
+                    name: "HDSE I",
                     books: [],
                     isEmpty: true
                 },
                 {
                     semester: 4,
-                    name: "HDSE II (Semester 4)",
+                    name: "HDSE II",
                     books: [],
                     isEmpty: true
                 },
                 {
                     semester: 5,
-                    name: "ADSE I (Semester 5)",
+                    name: "ADSE I",
                     books: [],
                     isEmpty: true
                 },
                 {
                     semester: 6,
-                    name: "ADSE II (Semester 6)",
+                    name: "ADSE II",
                     books: [],
                     isEmpty: true
                 }
