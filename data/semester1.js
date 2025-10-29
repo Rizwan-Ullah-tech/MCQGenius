@@ -19,6 +19,7 @@ const semester1Data = {
         options: ["A Web-based project management platform", "A distributed Version Control System", "A programming language", "A type of database"],
         answer: "A distributed Version Control System"
       },
+      
       {
         question: "What is GitHub?",
         options: ["A local code editor", "A Web-based platform that hosts Git repositories", "A type of Git command", "An alternative to Git"],
