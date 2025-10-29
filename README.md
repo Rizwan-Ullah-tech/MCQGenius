@@ -126,6 +126,7 @@ Open an issue on GitHub or email Rizwan.ullah.tech@gmail.com
 Made for education
 
 
+
 ```
 MCQ-Exam-System
 ├─ books.html
@@ -146,6 +147,7 @@ MCQ-Exam-System
 ├─ print-paper.html
 ├─ question-bank.html
 ├─ semester.html
+├─ session-selection.html
 ├─ styles
 │  └─ main.css
 └─ test-results.html

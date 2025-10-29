@@ -164,24 +164,35 @@
 
         function generateTest() {
             const selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
+            const selectedSessions = JSON.parse(localStorage.getItem('selectedSessions'));
             const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
             const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
             
-            if (!selectedBooks || !courseData || !semesterData) {
+            if (!selectedBooks || !selectedSessions || !courseData || !semesterData) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            // Collect all MCQs from selected books
+            // Collect MCQs only from selected sessions
             let allMCQs = [];
             selectedBooks.forEach(book => {
-                book.mcqs.forEach(mcq => {
-                    allMCQs.push({
-                        ...mcq,
-                        bookTitle: book.title,
-                        bookId: book.id
+                const bookSelectedSessions = selectedSessions[book.id] || [];
+                
+                if (book.sessions && bookSelectedSessions.length > 0) {
+                    bookSelectedSessions.forEach(sessionName => {
+                        const sessionQuestions = book.sessions[sessionName];
+                        if (sessionQuestions) {
+                            sessionQuestions.forEach(mcq => {
+                                allMCQs.push({
+                                    ...mcq,
+                                    bookTitle: book.title,
+                                    bookId: book.id,
+                                    sessionName: sessionName
+                                });
+                            });
+                        }
                     });
-                });
+                }
             });
 
             // Shuffle and select 20 questions

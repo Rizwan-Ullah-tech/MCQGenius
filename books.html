@@ -42,12 +42,9 @@
                 <!-- Books will be dynamically loaded here -->
             </div>
 
-            <div class="card-footer" style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button id="generateOnlineTest" class="btn btn-primary btn-lg flex-1">
-                    🎯 Start 20-Mark Online Test
-                </button>
-                <button id="generatePrintPaper" class="btn btn-secondary btn-lg flex-1">
-                    🖨️ Generate Print Paper
+            <div class="card-footer" style="margin-top: 2rem;">
+                <button id="nextToSessions" class="btn btn-primary btn-lg btn-block">
+                    Next: Select Sessions →
                 </button>
             </div>
         </div>
@@ -127,31 +124,19 @@
         }
 
         function updateButtonStates() {
-            const onlineBtn = document.getElementById('generateOnlineTest');
-            const printBtn = document.getElementById('generatePrintPaper');
-            
+            const nextBtn = document.getElementById('nextToSessions');
             const disabled = selectedBooks.length === 0;
-            onlineBtn.disabled = disabled;
-            printBtn.disabled = disabled;
+            nextBtn.disabled = disabled;
         }
 
         function setupButtons() {
-            document.getElementById('generateOnlineTest').addEventListener('click', () => {
+            document.getElementById('nextToSessions').addEventListener('click', () => {
                 if (selectedBooks.length === 0) {
                     alert('⚠️ Please select at least one book');
                     return;
                 }
                 localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
-                window.location.href = 'online-test.html';
-            });
-
-            document.getElementById('generatePrintPaper').addEventListener('click', () => {
-                if (selectedBooks.length === 0) {
-                    alert('⚠️ Please select at least one book');
-                    return;
-                }
-                localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
-                window.location.href = 'print-paper.html';
+                window.location.href = 'session-selection.html';
             });
 
             updateButtonStates();

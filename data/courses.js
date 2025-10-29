@@ -2,6 +2,8 @@
 // Two courses: ACCP-7062-Prime2.0 and ACCP-7144-AI
 
 import semester1Data from './semester1.js';
+import semester2Data from './semester2.js';
+import semester3Data from './semester3.js';
 
 const coursesData = {
     courses: [
@@ -14,18 +16,8 @@ const coursesData = {
             color: "#10b981",
             semesters: [
                 semester1Data,
-                {
-                    semester: 2,
-                    name: "DISM",
-                    books: [],
-                    isEmpty: true
-                },
-                {
-                    semester: 3,
-                    name: "HDSE I",
-                    books: [],
-                    isEmpty: true
-                },
+                semester2Data,
+                semester3Data,
                 {
                     semester: 4,
                     name: "HDSE II",

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Sessions - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .session-card {
+            background: var(--color-white);
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all var(--transition-base);
+            cursor: pointer;
+        }
+
+        .session-card:hover {
+            border-color: var(--color-primary);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .session-card.selected {
+            border-color: var(--color-primary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .book-section {
+            margin-bottom: 2rem;
+        }
+
+        .book-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .select-all-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all var(--transition-base);
+        }
+
+        .select-all-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Professional Assessment Platform</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><a href="question-bank.html" class="nav-btn">📖 Question Bank</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 3rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                <button onclick="window.history.back()" class="btn btn-outline" style="padding: 0.5rem 1rem;">
+                    ← Back
+                </button>
+                <div style="flex: 1;">
+                    <h2 class="card-title">Select Sessions</h2>
+                    <p class="card-subtitle">Choose which sessions to include in your test</p>
+                </div>
+            </div>
+
+            <div id="sessionsContainer">
+                <!-- Sessions will be dynamically loaded here -->
+            </div>
+
+            <div id="selectionSummary" class="card" style="background: var(--color-gray-50); margin-top: 2rem; padding: 1.5rem;">
+                <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.75rem;">📊 Selection Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--color-primary);" id="totalBooks">0</div>
+                        <div style="font-size: 0.875rem; color: var(--color-gray-600);">Books Selected</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--color-secondary);" id="totalSessions">0</div>
+                        <div style="font-size: 0.875rem; color: var(--color-gray-600);">Sessions Selected</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--color-success);" id="totalQuestions">0</div>
+                        <div style="font-size: 0.875rem; color: var(--color-gray-600);">Total Questions</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer" style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button id="generateOnlineTest" class="btn btn-primary btn-lg flex-1" disabled>
+                    🎯 Start 20-Mark Online Test
+                </button>
+                <button id="generatePrintPaper" class="btn btn-secondary btn-lg flex-1" disabled>
+                    🖨️ Generate Print Paper
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { escapeHTML } from './js/utils.js';
+        
+        let selectedBooks = [];
+        let selectedSessions = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            loadSessions();
+            setupButtons();
+        });
+
+        function loadSessions() {
+            selectedBooks = JSON.parse(localStorage.getItem('selectedBooks')) || [];
+            
+            if (selectedBooks.length === 0) {
+                window.location.href = 'books.html';
+                return;
+            }
+
+            // Initialize all sessions as selected
+            selectedBooks.forEach(book => {
+                selectedSessions[book.id] = [];
+                if (book.sessions) {
+                    Object.keys(book.sessions).forEach(sessionName => {
+                        selectedSessions[book.id].push(sessionName);
+                    });
+                }
+            });
+
+            renderSessions();
+            updateSummary();
+        }
+
+        function renderSessions() {
+            const container = document.getElementById('sessionsContainer');
+            container.innerHTML = '';
+
+            selectedBooks.forEach(book => {
+                if (!book.sessions || Object.keys(book.sessions).length === 0) {
+                    return;
+                }
+
+                const bookSection = document.createElement('div');
+                bookSection.className = 'book-section slide-in';
+
+                const bookHeader = document.createElement('div');
+                bookHeader.className = 'book-header';
+                bookHeader.innerHTML = `
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: 700;">${escapeHTML(book.title)}</div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.25rem;">${Object.keys(book.sessions).length} Sessions Available</div>
+                    </div>
+                    <button class="select-all-btn" data-book-id="${escapeHTML(book.id)}">
+                        Select All
+                    </button>
+                `;
+
+                const sessionsGrid = document.createElement('div');
+                sessionsGrid.style.display = 'grid';
+                sessionsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                sessionsGrid.style.gap = '0.75rem';
+
+                Object.entries(book.sessions).forEach(([sessionName, questions]) => {
+                    const sessionCard = document.createElement('div');
+                    sessionCard.className = 'session-card selected';
+                    sessionCard.dataset.bookId = book.id;
+                    sessionCard.dataset.sessionName = sessionName;
+
+                    sessionCard.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <input type="checkbox" class="form-checkbox session-checkbox" 
+                                id="session-${escapeHTML(book.id)}-${escapeHTML(sessionName)}" 
+                                checked>
+                            <label for="session-${escapeHTML(book.id)}-${escapeHTML(sessionName)}" 
+                                style="cursor: pointer; flex: 1; margin: 0;">
+                                <div style="font-weight: 600; color: var(--color-gray-800); margin-bottom: 0.25rem;">
+                                    ${escapeHTML(sessionName)}
+                                </div>
+                                <div style="font-size: 0.875rem; color: var(--color-gray-600);">
+                                    ❓ ${questions.length} Questions
+                                </div>
+                            </label>
+                        </div>
+                    `;
+
+                    const checkbox = sessionCard.querySelector('.session-checkbox');
+                    checkbox.addEventListener('change', (e) => {
+                        toggleSession(book.id, sessionName, e.target.checked);
+                        if (e.target.checked) {
+                            sessionCard.classList.add('selected');
+                        } else {
+                            sessionCard.classList.remove('selected');
+                        }
+                    });
+
+                    sessionCard.addEventListener('click', (e) => {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+
+                    sessionsGrid.appendChild(sessionCard);
+                });
+
+                bookSection.appendChild(bookHeader);
+                bookSection.appendChild(sessionsGrid);
+                container.appendChild(bookSection);
+
+                // Setup select all button
+                const selectAllBtn = bookHeader.querySelector('.select-all-btn');
+                selectAllBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleAllSessions(book.id);
+                });
+            });
+        }
+
+        function toggleSession(bookId, sessionName, selected) {
+            if (selected) {
+                if (!selectedSessions[bookId].includes(sessionName)) {
+                    selectedSessions[bookId].push(sessionName);
+                }
+            } else {
+                selectedSessions[bookId] = selectedSessions[bookId].filter(s => s !== sessionName);
+            }
+            updateSummary();
+        }
+
+        function toggleAllSessions(bookId) {
+            const book = selectedBooks.find(b => b.id === bookId);
+            if (!book || !book.sessions) return;
+
+            const allSessionNames = Object.keys(book.sessions);
+            const allSelected = allSessionNames.every(name => selectedSessions[bookId].includes(name));
+
+            if (allSelected) {
+                // Deselect all
+                selectedSessions[bookId] = [];
+                allSessionNames.forEach(sessionName => {
+                    const checkbox = document.getElementById(`session-${bookId}-${sessionName}`);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        checkbox.closest('.session-card').classList.remove('selected');
+                    }
+                });
+            } else {
+                // Select all
+                selectedSessions[bookId] = [...allSessionNames];
+                allSessionNames.forEach(sessionName => {
+                    const checkbox = document.getElementById(`session-${bookId}-${sessionName}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        checkbox.closest('.session-card').classList.add('selected');
+                    }
+                });
+            }
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            let totalSessionsCount = 0;
+            let totalQuestionsCount = 0;
+
+            selectedBooks.forEach(book => {
+                const bookSessions = selectedSessions[book.id] || [];
+                totalSessionsCount += bookSessions.length;
+
+                bookSessions.forEach(sessionName => {
+                    if (book.sessions && book.sessions[sessionName]) {
+                        totalQuestionsCount += book.sessions[sessionName].length;
+                    }
+                });
+            });
+
+            document.getElementById('totalBooks').textContent = selectedBooks.length;
+            document.getElementById('totalSessions').textContent = totalSessionsCount;
+            document.getElementById('totalQuestions').textContent = totalQuestionsCount;
+
+            // Update button states
+            const hasSelections = totalSessionsCount > 0;
+            document.getElementById('generateOnlineTest').disabled = !hasSelections;
+            document.getElementById('generatePrintPaper').disabled = !hasSelections;
+        }
+
+        function setupButtons() {
+            document.getElementById('generateOnlineTest').addEventListener('click', () => {
+                const hasSelections = Object.values(selectedSessions).some(sessions => sessions.length > 0);
+                if (!hasSelections) {
+                    alert('⚠️ Please select at least one session');
+                    return;
+                }
+                localStorage.setItem('selectedSessions', JSON.stringify(selectedSessions));
+                window.location.href = 'online-test.html';
+            });
+
+            document.getElementById('generatePrintPaper').addEventListener('click', () => {
+                const hasSelections = Object.values(selectedSessions).some(sessions => sessions.length > 0);
+                if (!hasSelections) {
+                    alert('⚠️ Please select at least one session');
+                    return;
+                }
+                localStorage.setItem('selectedSessions', JSON.stringify(selectedSessions));
+                window.location.href = 'print-paper.html';
+            });
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
