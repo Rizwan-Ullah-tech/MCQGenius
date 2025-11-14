@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Printed Paper - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .question-item {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-gray-300);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .question-text {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-gray-800);
+            flex: 1;
+        }
+
+        .question-number {
+            background: var(--color-primary);
+            color: var(--color-white);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: var(--font-size-sm);
+            margin-right: var(--spacing-md);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .option-item {
+            padding: var(--spacing-md);
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            background: var(--color-gray-50);
+        }
+
+        .option-item.correct-answer {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--color-success);
+            font-weight: 600;
+        }
+
+        .option-item.correct-answer::before {
+            content: "✓ ";
+            color: var(--color-success);
+            font-weight: 700;
+        }
+
+        .marking-section {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .mark-btn {
+            flex: 1;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 2px solid var(--color-gray-300);
+            border-radius: var(--radius-lg);
+            background: var(--color-white);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .mark-btn.correct {
+            background: var(--color-success);
+            color: var(--color-white);
+            border-color: var(--color-success);
+        }
+
+        .mark-btn.wrong {
+            background: var(--color-danger);
+            color: var(--color-white);
+            border-color: var(--color-danger);
+        }
+
+        .mark-btn.unanswered {
+            background: var(--color-gray-400);
+            color: var(--color-white);
+            border-color: var(--color-gray-400);
+        }
+
+        .mark-btn:hover:not(.correct):not(.wrong):not(.unanswered) {
+            background: var(--color-gray-100);
+        }
+
+        .search-box {
+            position: sticky;
+            top: 80px;
+            z-index: 100;
+            background: var(--color-white);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .score-summary {
+            position: sticky;
+            top: 80px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: var(--color-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: var(--font-size-4xl);
+            font-weight: 700;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+            font-size: var(--font-size-sm);
+        }
+
+        .highlight {
+            background-color: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Check Printed Paper</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+        <div class="grid grid-cols-3" style="gap: 2rem;">
+            <div style="grid-column: span 2;">
+                <div class="search-box">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--color-gray-800);">
+                        🔍 Search Questions
+                    </h3>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="form-input" 
+                        placeholder="Search by question text, topic, or keyword..."
+                        autocomplete="off"
+                    >
+                    <p style="font-size: 0.875rem; color: var(--color-gray-600); margin-top: 0.5rem;">
+                        💡 Tip: Type any keyword to quickly find a specific question
+                    </p>
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Questions will be loaded here -->
+                </div>
+
+                <div id="emptyState" class="card hidden" style="text-align: center; padding: 3rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📄</div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-gray-700);">No Test Selected</h3>
+                    <p style="color: var(--color-gray-600); margin-bottom: 2rem;">Please select a printed test from history to check answers</p>
+                    <a href="history.html" class="btn btn-primary">Go to History</a>
+                </div>
+            </div>
+
+            <div>
+                <div class="score-summary">
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Score</h3>
+                    <div class="score-value" id="totalScore">0/20</div>
+                    <div style="font-size: 1.25rem; font-weight: 600;" id="percentage">0%</div>
+                    
+                    <div class="score-breakdown">
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: 700;" id="correctCount">0</div>
+                            <div>✅ Correct</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: 700;" id="wrongCount">0</div>
+                            <div>❌ Wrong</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: 700;" id="unansweredCount">20</div>
+                            <div>⚪ Pending</div>
+                        </div>
+                    </div>
+
+                    <button id="resetMarking" class="btn btn-outline" style="margin-top: 1.5rem; width: 100%; background: rgba(255,255,255,0.1); border-color: white; color: white;">
+                        🔄 Reset All
+                    </button>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--color-gray-800);">
+                        📋 Test Info
+                    </h4>
+                    <div id="testInfo" style="font-size: 0.875rem; color: var(--color-gray-600);">
+                        <!-- Test info will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
+
+        let currentTest = null;
+        let questions = [];
+        let marking = {}; // { questionIndex: 'correct' | 'wrong' | 'unanswered' }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            loadTest();
+            setupSearch();
+            setupResetButton();
+            setupMarkingButtons();
+        });
+
+        function loadTest() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const testId = urlParams.get('testId');
+
+            if (!testId) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                return;
+            }
+
+            currentTest = testStorage.getById(testId);
+
+            if (!currentTest || !currentTest.questions) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                return;
+            }
+
+            questions = currentTest.questions;
+
+            // Initialize marking state
+            questions.forEach((_, index) => {
+                marking[index] = 'unanswered';
+            });
+
+            displayTestInfo();
+            displayQuestions();
+            updateScore();
+        }
+
+        function displayTestInfo() {
+            const info = document.getElementById('testInfo');
+            const booksText = currentTest.books.map(b => escapeHTML(b.title)).join(', ');
+            
+            info.innerHTML = `
+                <p><strong>Course:</strong> ${escapeHTML(currentTest.courseName)}</p>
+                <p><strong>Semester:</strong> ${escapeHTML(String(currentTest.semester))}</p>
+                <p><strong>Books:</strong> ${booksText}</p>
+                <p><strong>Questions:</strong> ${questions.length}</p>
+                <p><strong>Date:</strong> ${escapeHTML(new Date(currentTest.timestamp).toLocaleDateString())}</p>
+            `;
+        }
+
+        function displayQuestions(filteredQuestions = null) {
+            const container = document.getElementById('questionsContainer');
+            const questionsToShow = filteredQuestions || questions;
+
+            container.innerHTML = '';
+
+            if (questionsToShow.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 2rem;">
+                        <p style="color: var(--color-gray-600);">No questions found matching your search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            questionsToShow.forEach((q, displayIndex) => {
+                const actualIndex = questions.indexOf(q);
+                const marksPerQuestion = (20 / questions.length).toFixed(2);
+
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question-item';
+                questionEl.dataset.index = actualIndex;
+
+                questionEl.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">Q${actualIndex + 1}</div>
+                        <div class="question-text">${highlightSearch(q.question)}</div>
+                        <div class="badge badge-info">${marksPerQuestion} marks</div>
+                    </div>
+                    
+                    <div class="options-grid">
+                        ${q.options.map((opt, optIndex) => `
+                            <div class="option-item ${optIndex === q.correctAnswer ? 'correct-answer' : ''}">
+                                ${String.fromCharCode(65 + optIndex)}. ${highlightSearch(opt)}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="marking-section">
+                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--color-gray-700); min-width: 120px;">
+                            Mark as:
+                        </span>
+                        <button class="mark-btn ${marking[actualIndex] === 'correct' ? 'correct' : ''}" 
+                                data-question-index="${actualIndex}" data-mark-type="correct">
+                            ✅ Correct
+                        </button>
+                        <button class="mark-btn ${marking[actualIndex] === 'wrong' ? 'wrong' : ''}" 
+                                data-question-index="${actualIndex}" data-mark-type="wrong">
+                            ❌ Wrong
+                        </button>
+                        <button class="mark-btn ${marking[actualIndex] === 'unanswered' ? 'unanswered' : ''}" 
+                                data-question-index="${actualIndex}" data-mark-type="unanswered">
+                            ⚪ Unanswered
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(questionEl);
+            });
+        }
+
+        function highlightSearch(text) {
+            const searchInput = document.getElementById('searchInput');
+            const escaped = escapeHTML(text);
+            
+            if (!searchInput || !searchInput.value.trim()) return escaped;
+
+            const searchTerm = searchInput.value.trim();
+            // Escape special regex characters in search term
+            const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+            return escaped.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function setupMarkingButtons() {
+            const container = document.getElementById('questionsContainer');
+            container.addEventListener('click', (e) => {
+                if (e.target.classList.contains('mark-btn')) {
+                    const index = parseInt(e.target.dataset.questionIndex);
+                    const status = e.target.dataset.markType;
+                    markQuestion(index, status);
+                }
+            });
+        }
+
+        function markQuestion(index, status) {
+            marking[index] = status;
+            
+            // Update button states
+            const questionEl = document.querySelector(`[data-index="${index}"]`);
+            if (questionEl) {
+                questionEl.querySelectorAll('.mark-btn').forEach(btn => {
+                    btn.classList.remove('correct', 'wrong', 'unanswered');
+                });
+
+                const btnMap = {
+                    'correct': 0,
+                    'wrong': 1,
+                    'unanswered': 2
+                };
+                questionEl.querySelectorAll('.mark-btn')[btnMap[status]].classList.add(status);
+            }
+
+            updateScore();
+        }
+
+        function updateScore() {
+            let correct = 0;
+            let wrong = 0;
+            let unanswered = 0;
+
+            Object.values(marking).forEach(status => {
+                if (status === 'correct') correct++;
+                else if (status === 'wrong') wrong++;
+                else unanswered++;
+            });
+
+            const totalMarks = 20;
+            const marksPerQuestion = totalMarks / questions.length;
+            const score = (correct * marksPerQuestion).toFixed(2);
+            const percentage = ((correct / questions.length) * 100).toFixed(1);
+
+            document.getElementById('totalScore').textContent = `${score}/${totalMarks}`;
+            document.getElementById('percentage').textContent = `${percentage}%`;
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('wrongCount').textContent = wrong;
+            document.getElementById('unansweredCount').textContent = unanswered;
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+
+                if (!searchTerm) {
+                    displayQuestions();
+                    return;
+                }
+
+                const filtered = questions.filter(q => 
+                    q.question.toLowerCase().includes(searchTerm) ||
+                    q.options.some(opt => opt.toLowerCase().includes(searchTerm))
+                );
+
+                displayQuestions(filtered);
+            });
+        }
+
+        function setupResetButton() {
+            const resetBtn = document.getElementById('resetMarking');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to reset all markings? This cannot be undone.')) {
+                        questions.forEach((_, index) => {
+                            marking[index] = 'unanswered';
+                        });
+                        displayQuestions();
+                        updateScore();
+                    }
+                });
+            }
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

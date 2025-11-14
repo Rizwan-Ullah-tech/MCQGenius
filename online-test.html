@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20-Mark Online Test - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .question-card {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-gray-300);
+            transition: all var(--transition-base);
+        }
+
+        .question-card.answered {
+            border-left-color: var(--color-primary);
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: var(--spacing-md);
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-sm);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .option-label:hover {
+            border-color: var(--color-primary);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .option-label input[type="radio"]:checked + .option-text {
+            font-weight: 600;
+        }
+
+        .option-label input[type="radio"]:checked ~ * {
+            color: var(--color-primary);
+        }
+
+        .option-label input[type="radio"]:checked {
+            accent-color: var(--color-primary);
+        }
+
+        .option-label.selected {
+            border-color: var(--color-primary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .score-display {
+            position: sticky;
+            top: 80px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: var(--color-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .timer {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-top: var(--spacing-md);
+        }
+
+        .progress-fill {
+            background: var(--color-white);
+            height: 100%;
+            transition: width var(--transition-base);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">20-Mark Online Test</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><span class="nav-btn" id="questionProgress">0/20</span></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+        <div class="grid grid-cols-3" style="gap: 2rem;">
+            <div style="grid-column: span 2;">
+                <div class="card fade-in">
+                    <h2 class="card-title" style="margin-bottom: 0.5rem;">📝 Answer All Questions</h2>
+                    <p class="card-subtitle" id="testInfo">20-mark test from selected books</p>
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Questions will be loaded here -->
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <button id="submitTest" class="btn btn-success btn-lg btn-block">
+                        ✅ Submit Test
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <div class="score-display">
+                    <div style="font-size: var(--font-size-sm); opacity: 0.9; margin-bottom: var(--spacing-xs);">Current Score</div>
+                    <div style="font-size: 3.5rem; font-weight: 700; margin-bottom: var(--spacing-xs);" id="currentScore">0/20</div>
+                    <div style="font-size: var(--font-size-lg); font-weight: 600;" id="percentage">0%</div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    
+                    <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">Questions Answered</div>
+                        <div style="font-size: var(--font-size-2xl); font-weight: 700; margin-top: var(--spacing-xs);" id="answeredCount">0/20</div>
+                    </div>
+
+                    <div id="timerContainer" class="hidden" style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">Time Remaining</div>
+                        <div class="timer" id="timer">30:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
+
+        let questions = [];
+        let userAnswers = {};
+        let startTime = new Date();
+        let timerInterval = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            generateTest();
+            setupSubmitButton();
+        });
+
+        function generateTest() {
+            const selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
+            const selectedSessions = JSON.parse(localStorage.getItem('selectedSessions'));
+            const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
+            const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
+            
+            if (!selectedBooks || !selectedSessions || !courseData || !semesterData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Collect MCQs only from selected sessions
+            let allMCQs = [];
+            selectedBooks.forEach(book => {
+                const bookSelectedSessions = selectedSessions[book.id] || [];
+                
+                if (book.sessions && bookSelectedSessions.length > 0) {
+                    bookSelectedSessions.forEach(sessionName => {
+                        const sessionQuestions = book.sessions[sessionName];
+                        if (sessionQuestions) {
+                            sessionQuestions.forEach(mcq => {
+                                allMCQs.push({
+                                    ...mcq,
+                                    bookTitle: book.title,
+                                    bookId: book.id,
+                                    sessionName: sessionName
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Shuffle and select 20 questions
+            questions = shuffleArray(allMCQs).slice(0, 20);
+
+            // Update test info
+            const bookTitles = selectedBooks.map(b => b.title).join(', ');
+            document.getElementById('testInfo').textContent = 
+                `${courseData.name} - Semester ${semesterData.semester} - ${bookTitles}`;
+
+            displayQuestions();
+        }
+
+        function displayQuestions() {
+            const container = document.getElementById('questionsContainer');
+            
+            questions.forEach((question, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card slide-in';
+                questionCard.dataset.questionIndex = index;
+                
+                const optionsHTML = question.options.map((option, optIndex) => `
+                    <label class="option-label" data-question="${index}" data-option="${optIndex}">
+                        <input type="radio" name="question${index}" value="${optIndex}" 
+                            class="form-radio" style="margin-right: 0.75rem; margin-top: 0.125rem;">
+                        <span class="option-text" style="flex: 1;">${escapeHTML(option)}</span>
+                    </label>
+                `).join('');
+
+                questionCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div class="badge badge-primary">${escapeHTML(question.bookTitle)}</div>
+                        <div class="badge" style="background: var(--color-gray-200); color: var(--color-gray-700);">
+                            Question ${index + 1}/20
+                        </div>
+                    </div>
+                    <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--color-gray-800);">
+                        ${index + 1}. ${escapeHTML(question.question)}
+                    </div>
+                    <div class="options-container">
+                        ${optionsHTML}
+                    </div>
+                `;
+
+                container.appendChild(questionCard);
+
+                // Add event listeners to radio buttons
+                const radios = questionCard.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const questionIndex = parseInt(e.target.name.replace('question', ''));
+                        const selectedOption = parseInt(e.target.value);
+                        
+                        userAnswers[questionIndex] = selectedOption;
+                        
+                        // Update card styling
+                        questionCard.classList.add('answered');
+                        
+                        // Update option styling
+                        const allOptions = questionCard.querySelectorAll('.option-label');
+                        allOptions.forEach(opt => opt.classList.remove('selected'));
+                        e.target.closest('.option-label').classList.add('selected');
+                        
+                        updateStats();
+                    });
+                });
+            });
+        }
+
+        function updateStats() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const progress = (answeredCount / 20) * 100;
+            
+            document.getElementById('answeredCount').textContent = `${answeredCount}/20`;
+            document.getElementById('questionProgress').textContent = `${answeredCount}/20`;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            
+            // Note: We don't calculate score during test (only after submission)
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function setupSubmitButton() {
+            document.getElementById('submitTest').addEventListener('click', () => {
+                const answeredCount = Object.keys(userAnswers).length;
+                
+                if (answeredCount < 20) {
+                    const unanswered = 20 - answeredCount;
+                    if (!confirm(`⚠️ You have ${unanswered} unanswered question(s). Submit anyway?`)) {
+                        return;
+                    }
+                }
+                
+                submitTest();
+            });
+        }
+
+        function submitTest() {
+            const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
+            const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
+            const selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
+            
+            // Calculate score
+            let correctCount = 0;
+            const results = questions.map((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === question.correctAnswer;
+                if (isCorrect) correctCount++;
+                
+                return {
+                    question: question.question,
+                    options: question.options,
+                    userAnswer: userAnswer !== undefined ? userAnswer : null,
+                    correctAnswer: question.correctAnswer,
+                    isCorrect: isCorrect,
+                    bookTitle: question.bookTitle
+                };
+            });
+
+            const percentage = Math.round((correctCount / 20) * 100);
+            const endTime = new Date();
+            const timeTaken = Math.floor((endTime - startTime) / 1000); // seconds
+
+            // Save to history
+            const testData = {
+                courseId: courseData.id,
+                courseName: courseData.name,
+                semester: semesterData.semester,
+                books: selectedBooks.map(b => ({ id: b.id, title: b.title })),
+                questions: results,
+                score: correctCount,
+                totalQuestions: 20,
+                percentage: percentage,
+                timeTaken: timeTaken,
+                testType: 'online'
+            };
+
+            testStorage.saveTest(testData);
+
+            // Redirect to results page
+            localStorage.setItem('currentTestResults', JSON.stringify({
+                ...testData,
+                justCompleted: true
+            }));
+            window.location.href = 'test-results.html';
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

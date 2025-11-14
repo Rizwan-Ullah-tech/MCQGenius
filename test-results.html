@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .result-card {
+            border-left: 4px solid;
+            margin-bottom: var(--spacing-md);
+        }
+        .result-card.correct { border-left-color: var(--color-success); background: rgba(16, 185, 129, 0.05); }
+        .result-card.incorrect { border-left-color: var(--color-danger); background: rgba(239, 68, 68, 0.05); }
+        .result-card.unanswered { border-left-color: var(--color-warning); background: rgba(245, 158, 11, 0.05); }
+    </style>
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Test Results</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="max-width: 1000px; margin: 0 auto;">
+            <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); border-radius: var(--radius-xl); color: var(--color-white); margin-bottom: 2rem;">
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">🎉 Test Completed!</h2>
+                <div style="font-size: 4rem; font-weight: 700; margin: 1rem 0;" id="scoreDisplay">0/20</div>
+                <div style="font-size: 1.5rem; font-weight: 600;" id="percentageDisplay">0%</div>
+                <div style="font-size: 1rem; opacity: 0.9; margin-top: 1rem;" id="gradeDisplay"></div>
+            </div>
+
+            <div class="grid grid-cols-4" style="margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-success);" id="correctCount">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Correct</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-danger);" id="wrongCount">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Wrong</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-warning);" id="unansweredCount">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Unanswered</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-secondary);" id="timeTaken">0:00</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Time Taken</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">📝 Detailed Review</h3>
+                <div id="reviewContainer">
+                    <!-- Review items will be loaded here -->
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2" style="gap: 1rem;">
+                <button onclick="window.location.href='books.html'" class="btn btn-primary btn-lg">
+                    🔄 Take Another Test
+                </button>
+                <button onclick="window.location.href='history.html'" class="btn btn-secondary btn-lg">
+                    📚 View All Tests
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { escapeHTML } from './js/utils.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            displayResults();
+        });
+
+        function displayResults() {
+            const resultsData = JSON.parse(localStorage.getItem('currentTestResults'));
+            
+            if (!resultsData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Display score
+            document.getElementById('scoreDisplay').textContent = `${resultsData.score}/20`;
+            document.getElementById('percentageDisplay').textContent = `${resultsData.percentage}%`;
+            document.getElementById('gradeDisplay').textContent = getGrade(resultsData.percentage);
+
+            // Display stats
+            const correct = resultsData.score;
+            const unanswered = resultsData.questions.filter(q => q.userAnswer === null).length;
+            const wrong = 20 - correct - unanswered;
+
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('wrongCount').textContent = wrong;
+            document.getElementById('unansweredCount').textContent = unanswered;
+            
+            // Display time
+            const minutes = Math.floor(resultsData.timeTaken / 60);
+            const seconds = resultsData.timeTaken % 60;
+            document.getElementById('timeTaken').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Display detailed review
+            displayReview(resultsData.questions);
+        }
+
+        function displayReview(questions) {
+            const container = document.getElementById('reviewContainer');
+            
+            questions.forEach((q, index) => {
+                const resultType = q.userAnswer === null ? 'unanswered' : 
+                                   q.isCorrect ? 'correct' : 'incorrect';
+                
+                const card = document.createElement('div');
+                card.className = `card result-card ${resultType}`;
+                card.style.padding = '1.5rem';
+                
+                const statusIcon = q.userAnswer === null ? '⚠️' : 
+                                   q.isCorrect ? '✅' : '❌';
+                const statusText = q.userAnswer === null ? 'Unanswered' : 
+                                   q.isCorrect ? 'Correct' : 'Incorrect';
+                const statusColor = q.userAnswer === null ? 'var(--color-warning)' : 
+                                    q.isCorrect ? 'var(--color-success)' : 'var(--color-danger)';
+
+                let answerHTML = '';
+                if (q.userAnswer !== null) {
+                    answerHTML = `
+                        <div style="margin-top: 1rem; font-size: 0.875rem;">
+                            <div style="color: ${q.isCorrect ? 'var(--color-success)' : 'var(--color-danger)'}; font-weight: 600;">
+                                <strong>Your answer:</strong> ${escapeHTML(q.options[q.userAnswer])}
+                            </div>
+                            ${!q.isCorrect ? `
+                                <div style="color: var(--color-success); font-weight: 600; margin-top: 0.5rem;">
+                                    <strong>Correct answer:</strong> ${escapeHTML(q.options[q.correctAnswer])}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                } else {
+                    answerHTML = `
+                        <div style="margin-top: 1rem; font-size: 0.875rem;">
+                            <div style="color: var(--color-success); font-weight: 600;">
+                                <strong>Correct answer:</strong> ${escapeHTML(q.options[q.correctAnswer])}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                        <div class="badge badge-primary">${escapeHTML(q.bookTitle)}</div>
+                        <div style="font-weight: 600; color: ${statusColor};">
+                            ${statusIcon} ${statusText}
+                        </div>
+                    </div>
+                    <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                        ${index + 1}. ${escapeHTML(q.question)}
+                    </div>
+                    ${answerHTML}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function getGrade(percentage) {
+            if (percentage >= 90) return 'Excellent! 🌟';
+            if (percentage >= 80) return 'Very Good! 🎉';
+            if (percentage >= 70) return 'Good 👍';
+            if (percentage >= 60) return 'Fair 👌';
+            if (percentage >= 50) return 'Pass ✓';
+            return 'Need Improvement 📚';
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

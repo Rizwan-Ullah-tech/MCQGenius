@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Print Paper - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.4in;
+            }
+            
+            body { 
+                background: white; 
+                color: black;
+                font-size: 10pt;
+                line-height: 1.3;
+            }
+            
+            .no-print { display: none !important; }
+            
+            #paperPreview {
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            #paperPreview h1 {
+                font-size: 14pt;
+                margin-bottom: 0.2in;
+            }
+            
+            #paperPreview p {
+                font-size: 9pt;
+                margin-bottom: 0.1in;
+            }
+            
+            .answer-sheet {
+                gap: 0.15rem !important;
+                margin-top: 0.3rem !important;
+            }
+            
+            .answer-item {
+                padding: 0.2rem 0.3rem !important;
+                font-size: 8pt !important;
+                line-height: 1.2;
+            }
+            
+            /* Compact question spacing */
+            #paperPreview > div[style*="margin-bottom: 1.5rem"] {
+                margin-bottom: 0.4rem !important;
+            }
+            
+            /* Header section */
+            #paperPreview > div:first-child {
+                margin-bottom: 0.3in !important;
+                padding-bottom: 0.15in !important;
+            }
+            
+            /* Instructions box */
+            #paperPreview > div[style*="background: rgba(16, 185, 129, 0.1)"] {
+                margin-bottom: 0.3rem !important;
+                padding: 0.3rem !important;
+                font-size: 8pt !important;
+            }
+            
+            /* Question text */
+            div[style*="font-weight: 600"] {
+                font-size: 9pt !important;
+                margin-bottom: 0.3rem !important;
+            }
+            
+            /* Student info grid */
+            div[style*="grid-template-columns: repeat(2, 1fr)"] > div {
+                font-size: 8pt !important;
+            }
+        }
+
+        .answer-sheet {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .answer-item {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Generate Print Paper</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container no-print" style="padding-top: 2rem;">
+        <div class="card" style="max-width: 1000px; margin: 0 auto 2rem;">
+            <h2 class="card-title">Configure Question Paper</h2>
+            <div class="form-group">
+                <label class="form-label">Number of Questions</label>
+                <input type="range" id="questionCount" class="form-input" min="10" max="50" value="20" step="5">
+                <div style="text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--color-primary); margin-top: 0.5rem;">
+                    <span id="questionCountDisplay">20</span> Questions
+                </div>
+            </div>
+            <div class="grid grid-cols-3">
+                <button id="generatePreview" class="btn btn-primary btn-lg">
+                    👁️ Preview Paper
+                </button>
+                <button id="printPaper" class="btn btn-success btn-lg" disabled>
+                    🖨️ Print Exam Paper
+                </button>
+                <button id="printAnswerKey" class="btn btn-secondary btn-lg" disabled>
+                    🔑 Print Answer Key
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="padding-bottom: 3rem;">
+        <div id="paperPreview" class="card" style="max-width: 210mm; margin: 0 auto; padding: 2rem; display: none;">
+            <!-- Preview will be generated here -->
+        </div>
+    </div>
+
+    <script type="module">
+        import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
+
+        let currentQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            setupControls();
+        });
+
+        function setupControls() {
+            const slider = document.getElementById('questionCount');
+            const display = document.getElementById('questionCountDisplay');
+            
+            slider.addEventListener('input', (e) => {
+                display.textContent = e.target.value;
+            });
+
+            document.getElementById('generatePreview').addEventListener('click', generatePreview);
+            document.getElementById('printPaper').addEventListener('click', printExamPaper);
+            document.getElementById('printAnswerKey').addEventListener('click', printAnswerKey);
+        }
+
+        function generatePreview() {
+            const selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
+            const selectedSessions = JSON.parse(localStorage.getItem('selectedSessions'));
+            const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
+            const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
+            const questionCount = parseInt(document.getElementById('questionCount').value);
+            
+            if (!selectedBooks || !selectedSessions || !courseData || !semesterData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Collect MCQs only from selected sessions
+            let allMCQs = [];
+            selectedBooks.forEach(book => {
+                const bookSelectedSessions = selectedSessions[book.id] || [];
+                
+                if (book.sessions && bookSelectedSessions.length > 0) {
+                    bookSelectedSessions.forEach(sessionName => {
+                        const sessionQuestions = book.sessions[sessionName];
+                        if (sessionQuestions) {
+                            sessionQuestions.forEach(mcq => {
+                                allMCQs.push({
+                                    ...mcq,
+                                    bookTitle: book.title,
+                                    sessionName: sessionName
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Shuffle and select questions
+            currentQuestions = shuffleArray(allMCQs).slice(0, Math.min(questionCount, allMCQs.length));
+
+            // Generate preview
+            const preview = document.getElementById('paperPreview');
+            const bookTitles = selectedBooks.map(b => escapeHTML(b.title)).join(', ');
+            
+            let questionsHTML = '';
+            currentQuestions.forEach((q, index) => {
+                questionsHTML += `
+                    <div style="margin-bottom: 1rem; page-break-inside: avoid;">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            ${index + 1}. ${escapeHTML(q.question)}
+                        </div>
+                        <div class="answer-sheet">
+                            ${q.options.map((opt, optIndex) => `
+                                <div class="answer-item">
+                                    ${optIndex + 1}) ${escapeHTML(opt)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            preview.innerHTML = `
+                <div style="text-align: center; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--color-gray-300);">
+                    <p style="font-size: 0.9rem; color: var(--color-gray-600); margin-bottom: 0.75rem;">
+                        ${bookTitles}
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; text-align: left; margin-top: 1rem; font-size: 0.85rem;">
+                        <div>Student Name: _______________________</div>
+                        <div>Batch: ______________</div>
+                        <div>Student ID: _______________________</div>
+                        <div>Date: ______________</div>
+                    </div>
+                </div>
+
+                ${questionsHTML}
+            `;
+
+            preview.style.display = 'block';
+            document.getElementById('printPaper').disabled = false;
+            document.getElementById('printAnswerKey').disabled = false;
+
+            // Save to history
+            const testData = {
+                courseId: courseData.id,
+                courseName: courseData.name,
+                semester: semesterData.semester,
+                books: selectedBooks.map(b => ({ id: b.id, title: b.title })),
+                questions: currentQuestions.map(q => ({
+                    question: q.question,
+                    options: q.options,
+                    correctAnswer: q.correctAnswer,
+                    bookTitle: q.bookTitle
+                })),
+                score: 0,
+                totalQuestions: currentQuestions.length,
+                percentage: 0,
+                testType: 'printed'
+            };
+
+            testStorage.saveTest(testData);
+
+            // Scroll to preview
+            preview.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function printExamPaper() {
+            window.print();
+        }
+
+        function printAnswerKey() {
+            if (currentQuestions.length === 0) {
+                alert('Please generate a paper first');
+                return;
+            }
+
+            const selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
+            const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
+            const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
+            const bookTitles = selectedBooks.map(b => escapeHTML(b.title)).join(', ');
+
+            // Create new window for answer key
+            const answerWindow = window.open('', '_blank');
+            answerWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Answer Key - ${escapeHTML(courseData.name)}</title>
+                    <link rel="stylesheet" href="styles/main.css">
+                    <style>
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            padding: 1in;
+                            background: white;
+                            color: black;
+                        }
+                        .answer-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 1rem;
+                            margin-top: 2rem;
+                        }
+                        .answer-item {
+                            padding: 1rem;
+                            background: rgba(16, 185, 129, 0.1);
+                            border: 2px solid #10b981;
+                            border-radius: 0.5rem;
+                            font-weight: 600;
+                            text-align: center;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 2rem;
+                            padding-bottom: 1rem;
+                            border-bottom: 2px solid #e5e7eb;
+                        }
+                        .details {
+                            margin-top: 1rem;
+                            padding: 1rem;
+                            background: #f3f4f6;
+                            border-radius: 0.5rem;
+                        }
+                        @media print {
+                            body { margin: 0; padding: 0.5in; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">
+                            ANSWER KEY - FOR TEACHER USE ONLY
+                        </h1>
+                        <p style="font-size: 1rem; color: #6b7280;">
+                            ${escapeHTML(courseData.name)} - Semester ${escapeHTML(String(semesterData.semester))}
+                        </p>
+                        <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                            ${bookTitles}
+                        </p>
+                    </div>
+
+                    <div class="details">
+                        <p><strong>Total Questions:</strong> ${currentQuestions.length}</p>
+                        <p><strong>Total Marks:</strong> 20</p>
+                        <p><strong>Marks per Question:</strong> ${(20 / currentQuestions.length).toFixed(2)}</p>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+
+                    <h2 style="font-size: 1.25rem; font-weight: 700; margin: 2rem 0 1rem 0;">
+                        Correct Answers
+                    </h2>
+
+                    <div class="answer-grid">
+                        ${currentQuestions.map((q, index) => `
+                            <div class="answer-item">
+                                <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">
+                                    Question ${index + 1}
+                                </div>
+                                <div style="font-size: 1.5rem; color: #10b981;">
+                                    ${q.correctAnswer + 1}
+                                </div>
+                                <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
+                                    (${String.fromCharCode(65 + q.correctAnswer)})
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="margin-top: 3rem; padding: 1rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0.5rem;">
+                        <p style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Important Notes:</p>
+                        <ul style="margin-left: 1.5rem; color: #78350f;">
+                            <li>This answer key is for teacher reference only</li>
+                            <li>Do not distribute to students before the exam</li>
+                            <li>Each correct answer = ${(20 / currentQuestions.length).toFixed(2)} marks</li>
+                            <li>Total possible score = 20 marks</li>
+                        </ul>
+                    </div>
+
+                    <script>
+                        window.onload = () => window.print();
+                    <\/script>
+                </body>
+                </html>
+            `);
+            answerWindow.document.close();
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

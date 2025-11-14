@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Books - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Professional Assessment Platform</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><a href="question-bank.html" class="nav-btn">📖 Question Bank</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 3rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="max-width: 1000px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                <button onclick="window.history.back()" class="btn btn-outline" style="padding: 0.5rem 1rem;">
+                    ← Back
+                </button>
+                <div style="flex: 1;">
+                    <h2 class="card-title">Select Books</h2>
+                    <p class="card-subtitle" id="semesterInfo">Choose one or more books for your test</p>
+                </div>
+            </div>
+
+            <div id="booksContainer" class="grid grid-cols-1" style="gap: 1rem;">
+                <!-- Books will be dynamically loaded here -->
+            </div>
+
+            <div class="card-footer" style="margin-top: 2rem;">
+                <button id="nextToSessions" class="btn btn-primary btn-lg btn-block">
+                    Next: Select Sessions →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { escapeHTML } from './js/utils.js';
+        
+        let selectedBooks = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            loadBooks();
+            setupButtons();
+        });
+
+        function loadBooks() {
+            const semesterData = JSON.parse(localStorage.getItem('selectedSemester'));
+            const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
+            
+            if (!semesterData || !courseData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('semesterInfo').textContent = 
+                `${courseData.name} - Semester ${semesterData.semester}`;
+
+            const container = document.getElementById('booksContainer');
+            
+            semesterData.books.forEach(book => {
+                const bookCard = document.createElement('div');
+                bookCard.className = 'card card-hover';
+                bookCard.style.padding = '1.5rem';
+                bookCard.style.cursor = 'pointer';
+                bookCard.style.border = '2px solid transparent';
+                bookCard.dataset.bookId = book.id;
+
+                bookCard.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <input type="checkbox" class="form-checkbox book-checkbox" id="book-${escapeHTML(book.id)}" value="${escapeHTML(book.id)}">
+                        <label for="book-${escapeHTML(book.id)}" style="cursor: pointer; flex: 1; margin: 0;">
+                            <div style="font-size: 1.125rem; font-weight: 600; color: var(--color-gray-800); margin-bottom: 0.25rem;">
+                                ${escapeHTML(book.title)}
+                            </div>
+                            <div style="font-size: 0.875rem; color: var(--color-gray-600);">
+                                📖 ${escapeHTML(book.author)} • ❓ ${book.mcqs.length} Questions
+                            </div>
+                        </label>
+                    </div>
+                `;
+
+                const checkbox = bookCard.querySelector('.book-checkbox');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedBooks.push(book);
+                        bookCard.style.borderColor = 'var(--color-primary)';
+                        bookCard.style.background = 'rgba(16, 185, 129, 0.05)';
+                    } else {
+                        selectedBooks = selectedBooks.filter(b => b.id !== book.id);
+                        bookCard.style.borderColor = 'transparent';
+                        bookCard.style.background = '';
+                    }
+                    updateButtonStates();
+                });
+
+                bookCard.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+
+                container.appendChild(bookCard);
+            });
+        }
+
+        function updateButtonStates() {
+            const nextBtn = document.getElementById('nextToSessions');
+            const disabled = selectedBooks.length === 0;
+            nextBtn.disabled = disabled;
+        }
+
+        function setupButtons() {
+            document.getElementById('nextToSessions').addEventListener('click', () => {
+                if (selectedBooks.length === 0) {
+                    alert('⚠️ Please select at least one book');
+                    return;
+                }
+                localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
+                window.location.href = 'session-selection.html';
+            });
+
+            updateButtonStates();
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

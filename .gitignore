@@ -1,0 +1,49 @@
+
+# Replit-specific files
+.replit
+replit.nix
+replit.md
+
+# Backup files
+.git.backup.*
+*.backup
+
+# Source/attached assets (original text files already parsed)
+attached_assets/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Development tools
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local working artifacts
+.local/
+app.js.backup
+
+# Python virtual envs and tools
+venv/
+.venv/
+env/
+.pytest_cache/
+.m

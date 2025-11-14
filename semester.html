@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Semester - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Professional Assessment Platform</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><a href="question-bank.html" class="nav-btn">📖 Question Bank</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 3rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="max-width: 1000px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                <button onclick="window.history.back()" class="btn btn-outline" style="padding: 0.5rem 1rem;">
+                    ← Back
+                </button>
+                <div style="flex: 1;">
+                    <h2 class="card-title" id="courseTitle">Select Semester</h2>
+                    <p class="card-subtitle" id="courseDescription">Choose a semester to continue</p>
+                </div>
+            </div>
+
+            <div id="semestersContainer" class="semester-grid">
+                <!-- Semesters will be dynamically loaded here -->
+            </div>
+
+            <div id="noSemesters" class="hidden" style="text-align: center; padding: 3rem; color: var(--color-gray-500);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">No Semesters Available</h3>
+                <p>This course doesn't have any semesters populated yet.</p>
+                <a href="index.html" class="btn btn-primary mt-lg">← Back to Courses</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            loadSemesters();
+        });
+
+        function loadSemesters() {
+            const courseData = JSON.parse(localStorage.getItem('selectedCourse'));
+            
+            if (!courseData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Update page title
+            document.getElementById('courseTitle').textContent = courseData.name;
+            document.getElementById('courseDescription').textContent = 'Select a semester to continue';
+
+            const container = document.getElementById('semestersContainer');
+            const activeSemesters = courseData.semesters.filter(s => !s.isEmpty);
+
+            if (activeSemesters.length === 0) {
+                document.getElementById('noSemesters').classList.remove('hidden');
+                container.classList.add('hidden');
+                return;
+            }
+
+            activeSemesters.forEach(semester => {
+                const booksCount = semester.books ? semester.books.length : 0;
+                let questionsCount = 0;
+                if (semester.books) {
+                    semester.books.forEach(book => {
+                        questionsCount += book.mcqs.length;
+                    });
+                }
+
+                // Map semester numbers to names
+                const semesterNames = {
+                    1: 'CPISM',
+                    2: 'DISM',
+                    3: 'HDSE 1'
+                };
+                const semesterName = semesterNames[semester.semester] || `Semester ${semester.semester}`;
+
+                const semesterCard = document.createElement('div');
+                semesterCard.className = 'semester-card slide-in';
+                semesterCard.innerHTML = `
+                    <div class="semester-number">${semester.semester}</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-gray-800);">
+                        ${semesterName}
+                    </h3>
+                    <div class="semester-info">
+                        📚 ${booksCount} Book${booksCount !== 1 ? 's' : ''}<br>
+                        ❓ ${questionsCount} Questions
+                    </div>
+                `;
+
+                semesterCard.addEventListener('click', () => {
+                    localStorage.setItem('selectedSemester', JSON.stringify(semester));
+                    window.location.href = 'books.html';
+                });
+
+                container.appendChild(semesterCard);
+            });
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

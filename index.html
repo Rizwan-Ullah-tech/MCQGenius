@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Exam Management System - Select Course</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Professional Assessment Platform</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn active">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><a href="question-bank.html" class="nav-btn">📖 Question Bank</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 3rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="max-width: 1000px; margin: 0 auto;">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Select Your Course</h2>
+                    <p class="card-subtitle">Choose a course to begin your exam journey</p>
+                </div>
+                <div class="card-icon">🎓</div>
+            </div>
+
+            <div id="coursesContainer" class="grid grid-cols-2">
+                <!-- Courses will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <div class="card mt-lg fade-in" style="max-width: 1000px; margin: 2rem auto 0;">
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">📊 Quick Stats</h3>
+            <div class="grid grid-cols-4">
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary);" id="totalQuestions">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Total Questions</div>
+                </div>
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-secondary);" id="totalCourses">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Courses</div>
+                </div>
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-warning);" id="totalSemesters">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Active Semesters</div>
+                </div>
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-success);" id="totalTests">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600);">Tests Taken</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import coursesData from './data/courses.js';
+        import { escapeHTML } from './js/utils.js';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            renderCourses();
+            displayStats();
+        });
+
+        function renderCourses() {
+            const container = document.getElementById('coursesContainer');
+            const courses = coursesData.courses;
+
+            courses.forEach(course => {
+                const activeSemesters = course.semesters.filter(s => !s.isEmpty).length;
+                
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card slide-in';
+                courseCard.innerHTML = `
+                    <div class="course-icon" style="background: linear-gradient(135deg, ${escapeHTML(course.color)} 0%, ${escapeHTML(adjustColor(course.color, -20))} 100%);">
+                        ${escapeHTML(course.icon)}
+                    </div>
+                    <h3 class="course-title">${escapeHTML(course.name)}</h3>
+                    <p class="course-meta">${escapeHTML(course.fullName)}</p>
+                    <p class="course-meta" style="margin-top: 0.5rem;">
+                        📚 ${activeSemesters} Active Semester${activeSemesters !== 1 ? 's' : ''}
+                    </p>
+                `;
+                
+                courseCard.addEventListener('click', () => {
+                    localStorage.setItem('selectedCourse', JSON.stringify(course));
+                    window.location.href = 'semester.html';
+                });
+
+                container.appendChild(courseCard);
+            });
+        }
+
+        function displayStats() {
+            const courses = coursesData.courses;
+            
+            let totalQuestions = 0;
+            let activeSemesters = 0;
+
+            courses.forEach(course => {
+                course.semesters.forEach(semester => {
+                    if (!semester.isEmpty) {
+                        activeSemesters++;
+                        semester.books.forEach(book => {
+                            totalQuestions += book.mcqs.length;
+                        });
+                    }
+                });
+            });
+
+            const testHistory = JSON.parse(localStorage.getItem('testHistory')) || [];
+
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            document.getElementById('totalCourses').textContent = courses.length;
+            document.getElementById('totalSemesters').textContent = activeSemesters;
+            document.getElementById('totalTests').textContent = testHistory.length;
+        }
+
+        function adjustColor(color, percent) {
+            const num = parseInt(color.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+                (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
+                .toString(16).slice(1);
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

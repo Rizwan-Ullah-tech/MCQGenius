@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test History - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Professional Assessment Platform</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn active">📚 History</a></li>
+                <li><a href="question-bank.html" class="nav-btn">📖 Question Bank</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="margin-bottom: 2rem;">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Test History</h2>
+                    <p class="card-subtitle">Review all your past tests and track your progress</p>
+                </div>
+                <div class="card-icon">📊</div>
+            </div>
+
+            <div class="grid grid-cols-4" style="margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 1.5rem; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-success);" id="totalTests">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600); font-weight: 500;">Total Tests</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: rgba(59, 130, 246, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-secondary);" id="avgScore">0%</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600); font-weight: 500;">Average Score</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--color-warning);" id="onlineTests">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600); font-weight: 500;">Online Tests</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-lg);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #8b5cf6;" id="printedTests">0</div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600); font-weight: 500;">Printed Papers</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                <select id="courseFilter" class="form-select" style="flex: 1;">
+                    <option value="all">All Courses</option>
+                </select>
+                <select id="typeFilter" class="form-select" style="flex: 1;">
+                    <option value="all">All Types</option>
+                    <option value="online">Online Tests</option>
+                    <option value="printed">Printed Papers</option>
+                </select>
+                <button id="clearHistory" class="btn btn-danger">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <div id="historyContainer">
+            <!-- History items will be loaded here -->
+        </div>
+
+        <div id="emptyState" class="card hidden" style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📝</div>
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-gray-700);">No Tests Yet</h3>
+            <p style="color: var(--color-gray-600); margin-bottom: 2rem;">Take your first test to start tracking your progress!</p>
+            <a href="index.html" class="btn btn-primary">Start a Test</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import testStorage from './js/test-storage.js';
+        import { escapeHTML } from './js/utils.js';
+
+        let allTests = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            loadHistory();
+            setupFilters();
+            setupClearButton();
+            setupTestButtons();
+        });
+
+        function loadHistory() {
+            allTests = testStorage.getAll();
+            const stats = testStorage.getStats();
+
+            // Update stats
+            document.getElementById('totalTests').textContent = stats.total;
+            document.getElementById('avgScore').textContent = `${stats.avgPercentage}%`;
+            document.getElementById('onlineTests').textContent = stats.onlineTests;
+            document.getElementById('printedTests').textContent = stats.printedTests;
+
+            // Populate course filter
+            const courseFilter = document.getElementById('courseFilter');
+            const uniqueCourses = [...new Set(allTests.map(t => t.courseId))];
+            uniqueCourses.forEach(courseId => {
+                const test = allTests.find(t => t.courseId === courseId);
+                const option = document.createElement('option');
+                option.value = courseId;
+                option.textContent = test.courseName;
+                courseFilter.appendChild(option);
+            });
+
+            displayTests(allTests);
+        }
+
+        function displayTests(tests) {
+            const container = document.getElementById('historyContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (tests.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = '';
+
+            tests.forEach(test => {
+                const scoreClass = getScoreClass(test.percentage);
+                const testDate = new Date(test.timestamp).toLocaleString();
+                const booksList = test.books.map(b => escapeHTML(b.title)).join(', ');
+
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item slide-in';
+                
+                historyItem.innerHTML = `
+                    <div class="history-header">
+                        <div>
+                            <div class="badge badge-primary" style="margin-bottom: 0.5rem;">
+                                ${escapeHTML(test.courseName)} - Semester ${escapeHTML(String(test.semester))}
+                            </div>
+                            <div class="badge ${test.testType === 'online' ? 'badge-success' : 'badge-info'}">
+                                ${test.testType === 'online' ? '🎯 Online Test' : '🖨️ Printed Paper'}
+                            </div>
+                        </div>
+                        <div class="history-score ${scoreClass}">
+                            ${test.score}/${test.totalQuestions}
+                        </div>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--color-gray-600); margin-bottom: 0.5rem;">
+                        📚 ${booksList}
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--color-gray-500); margin-bottom: 1rem;">
+                        📅 ${escapeHTML(testDate)}
+                        ${test.timeTaken ? ` • ⏱️ ${formatTime(test.timeTaken)}` : ''}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        ${test.testType === 'online' ? `
+                            <button class="btn btn-sm btn-primary view-details-btn" data-test-id="${escapeHTML(test.id)}">
+                                👁️ View Results
+                            </button>
+                        ` : `
+                            <button class="btn btn-sm btn-success check-answers-btn" data-test-id="${escapeHTML(test.id)}">
+                                ✅ Check Answers
+                            </button>
+                        `}
+                        <button class="btn btn-sm btn-danger delete-test-btn" data-test-id="${escapeHTML(test.id)}">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(historyItem);
+            });
+        }
+
+        function setupFilters() {
+            const courseFilter = document.getElementById('courseFilter');
+            const typeFilter = document.getElementById('typeFilter');
+
+            courseFilter.addEventListener('change', applyFilters);
+            typeFilter.addEventListener('change', applyFilters);
+        }
+
+        function applyFilters() {
+            const courseFilter = document.getElementById('courseFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            let filtered = allTests;
+
+            if (courseFilter !== 'all') {
+                filtered = filtered.filter(t => t.courseId === courseFilter);
+            }
+
+            if (typeFilter !== 'all') {
+                filtered = filtered.filter(t => t.testType === typeFilter);
+            }
+
+            displayTests(filtered);
+        }
+
+        function setupClearButton() {
+            document.getElementById('clearHistory').addEventListener('click', () => {
+                if (confirm('⚠️ Are you sure you want to delete all test history? This cannot be undone.')) {
+                    testStorage.clearAll();
+                    window.location.reload();
+                }
+            });
+        }
+
+        function setupTestButtons() {
+            // Event delegation for test buttons
+            document.getElementById('historyContainer').addEventListener('click', (e) => {
+                const target = e.target;
+                const testId = target.dataset.testId;
+                
+                if (!testId) return;
+                
+                if (target.classList.contains('view-details-btn')) {
+                    viewDetails(testId);
+                } else if (target.classList.contains('check-answers-btn')) {
+                    checkAnswers(testId);
+                } else if (target.classList.contains('delete-test-btn')) {
+                    deleteTest(testId);
+                }
+            });
+        }
+
+        function viewDetails(testId) {
+            const test = testStorage.getById(testId);
+            if (test) {
+                localStorage.setItem('currentTestResults', JSON.stringify(test));
+                window.location.href = 'test-results.html';
+            }
+        }
+
+        function checkAnswers(testId) {
+            window.location.href = `comparison.html?testId=${testId}`;
+        }
+
+        function deleteTest(testId) {
+            if (confirm('⚠️ Are you sure you want to delete this test?')) {
+                testStorage.deleteTest(testId);
+                window.location.reload();
+            }
+        }
+
+        function getScoreClass(percentage) {
+            if (percentage >= 80) return 'score-excellent';
+            if (percentage >= 65) return 'score-good';
+            if (percentage >= 50) return 'score-fair';
+            return 'score-poor';
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

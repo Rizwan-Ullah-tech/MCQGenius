@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Bank - MCQ Exam System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .question-item {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .correct-answer {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--color-success);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar no-print">
+        <div class="container navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <div class="navbar-logo">Q</div>
+                <div>
+                    <h1 class="navbar-title">MCQ Exam System</h1>
+                    <p class="navbar-subtitle">Professional Assessment Platform</p>
+                </div>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="index.html" class="nav-btn">🏠 Home</a></li>
+                <li><a href="history.html" class="nav-btn">📚 History</a></li>
+                <li><a href="question-bank.html" class="nav-btn active">📖 Question Bank</a></li>
+                <li><button id="darkModeToggle" class="nav-btn">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+        <div class="card fade-in" style="margin-bottom: 2rem;">
+            <h2 class="card-title">Question Bank</h2>
+            <p class="card-subtitle">Browse and search through all available questions</p>
+
+            <div class="grid grid-cols-3" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Search Questions</label>
+                    <input type="text" id="searchInput" class="form-input" placeholder="Type to search...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Filter by Course</label>
+                    <select id="courseFilter" class="form-select">
+                        <option value="all">All Courses</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Filter by Semester</label>
+                    <select id="semesterFilter" class="form-select">
+                        <option value="all">All Semesters</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <span id="resultCount" style="color: var(--color-gray-600); font-size: 0.875rem;">
+                    Showing 0 questions
+                </span>
+            </div>
+        </div>
+
+        <div id="questionsContainer">
+            <!-- Questions will be loaded here -->
+        </div>
+
+        <div id="noResults" class="card hidden" style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">No Questions Found</h3>
+            <p style="color: var(--color-gray-600);">Try adjusting your filters or search term.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import coursesData from './data/courses.js';
+        import { escapeHTML } from './js/utils.js';
+
+        let allQuestions = [];
+        let filteredQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            setupDarkModeToggle();
+            loadQuestions();
+            setupFilters();
+        });
+
+        function loadQuestions() {
+            // Load all questions from all courses
+            coursesData.courses.forEach(course => {
+                course.semesters.forEach(semester => {
+                    if (!semester.isEmpty && semester.books) {
+                        semester.books.forEach(book => {
+                            book.mcqs.forEach(mcq => {
+                                allQuestions.push({
+                                    ...mcq,
+                                    courseId: course.id,
+                                    courseName: course.name,
+                                    semester: semester.semester,
+                                    bookTitle: book.title
+                                });
+                            });
+                        });
+                    }
+                });
+            });
+
+            // Populate course filter
+            const courseFilter = document.getElementById('courseFilter');
+            coursesData.courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.id;
+                option.textContent = course.name;
+                courseFilter.appendChild(option);
+            });
+
+            filteredQuestions = allQuestions;
+            displayQuestions(filteredQuestions);
+        }
+
+        function setupFilters() {
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('courseFilter').addEventListener('change', (e) => {
+                updateSemesterFilter(e.target.value);
+                applyFilters();
+            });
+            document.getElementById('semesterFilter').addEventListener('change', applyFilters);
+        }
+
+        function updateSemesterFilter(courseId) {
+            const semesterFilter = document.getElementById('semesterFilter');
+            semesterFilter.innerHTML = '<option value="all">All Semesters</option>';
+
+            if (courseId === 'all') return;
+
+            const course = coursesData.courses.find(c => c.id === courseId);
+            if (course) {
+                course.semesters.filter(s => !s.isEmpty).forEach(semester => {
+                    const option = document.createElement('option');
+                    option.value = semester.semester;
+                    option.textContent = `Semester ${semester.semester}`;
+                    semesterFilter.appendChild(option);
+                });
+            }
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const courseFilter = document.getElementById('courseFilter').value;
+            const semesterFilter = document.getElementById('semesterFilter').value;
+
+            filteredQuestions = allQuestions.filter(q => {
+                const matchesSearch = q.question.toLowerCase().includes(searchTerm) ||
+                                      q.options.some(opt => opt.toLowerCase().includes(searchTerm));
+                const matchesCourse = courseFilter === 'all' || q.courseId === courseFilter;
+                const matchesSemester = semesterFilter === 'all' || q.semester == semesterFilter;
+
+                return matchesSearch && matchesCourse && matchesSemester;
+            });
+
+            displayQuestions(filteredQuestions);
+        }
+
+        function displayQuestions(questions) {
+            const container = document.getElementById('questionsContainer');
+            const noResults = document.getElementById('noResults');
+            const resultCount = document.getElementById('resultCount');
+
+            resultCount.textContent = `Showing ${questions.length} question${questions.length !== 1 ? 's' : ''}`;
+
+            if (questions.length === 0) {
+                container.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            container.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const questionItem = document.createElement('div');
+                questionItem.className = 'question-item slide-in';
+
+                const optionsHTML = q.options.map((opt, optIndex) => {
+                    const isCorrect = optIndex === q.correctAnswer;
+                    return `
+                        <div class="option-label ${isCorrect ? 'correct-answer' : ''}" style="margin-bottom: 0.5rem; padding: 0.75rem; border-radius: 0.5rem;">
+                            ${isCorrect ? '✓ ' : ''}${escapeHTML(opt)}
+                        </div>
+                    `;
+                }).join('');
+
+                questionItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                        <div class="badge badge-primary">${escapeHTML(q.courseName)} - Semester ${escapeHTML(String(q.semester))}</div>
+                        <div class="badge" style="background: var(--color-gray-200); color: var(--color-gray-700);">
+                            ${escapeHTML(q.bookTitle)}
+                        </div>
+                    </div>
+                    <div style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--color-gray-800);">
+                        ${index + 1}. ${escapeHTML(q.question)}
+                    </div>
+                    <div>
+                        ${optionsHTML}
+                    </div>
+                `;
+
+                container.appendChild(questionItem);
+            });
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.textContent = '☀️';
+            }
+        }
+
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    toggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('darkMode', isDark);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
